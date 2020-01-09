@@ -80,12 +80,6 @@ public class BluetoothWifiService extends Service {
                 Log.e("WIFI : ", info.getBSSID());
                 Log.e("WIFI : ", info.getSSID());
                 Log.e("WIFI : ", info.getMacAddress());
-                super.onAvailable(network);
-            }
-
-            @Override
-            public void onLost(Network network) {
-                super.onLost(network);
             }
         });
 

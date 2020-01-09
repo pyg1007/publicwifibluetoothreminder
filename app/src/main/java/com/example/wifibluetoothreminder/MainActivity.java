@@ -2,7 +2,14 @@ package com.example.wifibluetoothreminder;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -33,9 +40,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         UI();
+        WifiStatus();
     }
 
     public void UI(){ //UI들 여기 작성
+
+    }
+
+    public void WifiStatus(){
+        ConnectivityManager CM = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkRequest networkRequest = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .build();
+
+        CM.registerNetworkCallback(networkRequest, new ConnectivityManager.NetworkCallback(){
+            @Override
+            public void onAvailable(Network network) {
+                WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                WifiInfo wifiInfo = WM.getConnectionInfo();
+                StartLog("Connect",wifiInfo.getBSSID());
+            }
+        });
 
     }
 
