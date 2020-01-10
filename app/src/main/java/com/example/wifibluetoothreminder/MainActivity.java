@@ -10,6 +10,7 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -70,7 +71,10 @@ public class MainActivity extends AppCompatActivity {
         if(!runningService.isRunning("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) { // 중복실행 막기위해서 사용
             StartToast("실행중아님");
             Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);
-            startService(intent);
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O)
+                startForegroundService(intent);
+            else
+                startService(intent);
         }else{
             StartToast("실행중");
         }

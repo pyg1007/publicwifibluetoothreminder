@@ -60,7 +60,6 @@ public class BluetoothWifiService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1234"); // 1234은 채널이름 수정가능
         builder.setSmallIcon(R.drawable.ic_launcher_background).setContentText(content).setContentTitle(title); // 이미지는 아무거나 사용했음.
         builder.setContentIntent(pendingIntent); // 이부분없애면 페딩인텐트 작동안함.
-        startForeground(2, builder.build()); // 포어그라운드 스타트 id는 수정가능
     }
 
     @Override
@@ -91,6 +90,7 @@ public class BluetoothWifiService extends Service {
     public void onDestroy() {
         //TODO : Service 종료시 할 일
         super.onDestroy();
+        stopForeground(true);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.example.wifibluetoothreminder.Service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -23,7 +24,10 @@ public class UnCatchTaskService extends Service {
         RunningService runningService = new RunningService(this);
         if (!runningService.isRunning("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) {
             Intent intent = new Intent(this, BluetoothWifiService.class);
-            startService(intent);
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O)
+                startForegroundService(intent);
+            else
+                startService(intent);
         }
         stopSelf();
     }
