@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -54,14 +55,14 @@ public class MainActivity extends AppCompatActivity {
 
         UI();
         WifiStatus();
-        checkperrmission();
+        checkpermmission();
     }
 
     public void UI(){ //UI들 여기 작성
 
     }
 
-    public void checkperrmission(){
+    public void checkpermmission(){
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
             int ACCESS_FINE_LOCATION_PERMISSION = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
             int ACCESS_COARSE_LOCATION_PERMISSION = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -76,6 +77,24 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("권한").setMessage("WIFI의 정보를 받아오기 위해서 필요합니다. 정말 거부하시겠습니까?");
+            builder.setPositiveButton("승인", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    checkpermmission();
+                }
+            });
+            builder.setNegativeButton("거부", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    AlertDialog.Builder no = new AlertDialog.Builder(MainActivity.this);
+                    no.setMessage("해당기능을 사용하기 위해서는 설정 -> App 및 알림 -> App 선택 -> 권한 -> 허용을 해주세요").show();
+                }
+            });
+            builder.show();
         }
     }
 
