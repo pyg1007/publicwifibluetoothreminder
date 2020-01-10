@@ -1,9 +1,15 @@
 package com.example.wifibluetoothreminder;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -22,6 +28,12 @@ import com.example.wifibluetoothreminder.Service.UnCatchTaskService;
 public class MainActivity extends AppCompatActivity {
 
     RunningService runningService;
+
+    // 변경되지 않을 상수
+    private static final int REQUEST_ACCESS_LOCATION = 1000;
+
+
+
     @Override
     protected void onStart() {
         stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
@@ -42,10 +54,29 @@ public class MainActivity extends AppCompatActivity {
 
         UI();
         WifiStatus();
+        checkperrmission();
     }
 
     public void UI(){ //UI들 여기 작성
 
+    }
+
+    public void checkperrmission(){
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            int ACCESS_FINE_LOCATION_PERMISSION = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+            int ACCESS_COARSE_LOCATION_PERMISSION = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+            if ( ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED || ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED)
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},REQUEST_ACCESS_LOCATION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(grantResults[0] != PackageManager.PERMISSION_GRANTED){
+        }
     }
 
     public void WifiStatus(){
