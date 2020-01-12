@@ -1,5 +1,6 @@
 package com.example.wifibluetoothreminder.Service;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -7,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -15,9 +17,9 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
@@ -50,7 +52,7 @@ public class BluetoothWifiService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationChannel notificationChannel = new NotificationChannel(ChannelID,"Android",NotificationManager.IMPORTANCE_LOW);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, ChannelID);
-        builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText(content).setContentTitle(title);
+        builder.setSmallIcon(R.drawable.ic_launcher_background).setContentText(content).setContentTitle(title);
         notificationManager.createNotificationChannel(notificationChannel);
         startForeground(2,builder.build());
     }
@@ -61,7 +63,6 @@ public class BluetoothWifiService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0); // 노티피 클릭시 이동할 수 있는 인텐트
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1234"); // 1234은 채널이름 수정가능
         builder.setSmallIcon(R.drawable.ic_launcher_background).setContentText(content).setContentTitle(title); // 이미지는 아무거나 사용했음.
-        builder.setContentIntent(pendingIntent); // 이부분없애면 페딩인텐트 작동안함.
         startForeground(2,builder.build());
     }
 
@@ -79,40 +80,51 @@ public class BluetoothWifiService extends Service {
 
             @Override
             public void onAvailable(Network network) {
-                WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                WifiInfo info = wifiManager.getConnectionInfo();
-
-
-                //TODO: noti 발생은 함. 클릭시 메인으로 값전달 안됨.
-                Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
-//                intent.putExtra("SSID", String.valueOf(info.getSSID()));
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                PendingIntent pendingIntent = PendingIntent.getActivity(BluetoothWifiService.this, 0, intent, 0); // 노티피 클릭시 이동할 수 있는 인텐트
-                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O) {
-                    String ChannelID = "Channel_2";
-                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    NotificationChannel Noti = new NotificationChannel(ChannelID, "android", NotificationManager.IMPORTANCE_DEFAULT);
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-                    builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText("WIFI가 연결되었습니다. 등록하시겠습니까?").setContentTitle("WIFI 연결감지").setAutoCancel(true);
-                    notificationManager.createNotificationChannel(Noti);
-                    notificationManager.notify(3,builder.build());
-                }else{
-                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, "1235");
-                    builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText("WIFI가 연결되었습니다. 등록하시겠습니까?").setContentTitle("WIFI 연결감지").setAutoCancel(true);
-                    notificationManager.notify(3,builder.build());
+                if(isPermission()) {
+                    Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(BluetoothWifiService.this, 0, intent, 0); // 노티피 클릭시 이동할 수 있는 인텐트
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        String ChannelID = "Channel_2";
+                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        NotificationChannel Noti = new NotificationChannel(ChannelID, "android", NotificationManager.IMPORTANCE_DEFAULT);
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
+                        builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText("WIFI가 연결되었습니다. 등록하시겠습니까?").setContentTitle("WIFI 연결감지").setAutoCancel(true);
+                        notificationManager.createNotificationChannel(Noti);
+                        notificationManager.notify(3, builder.build());
+                    } else {
+                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, "1235");
+                        builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText("WIFI가 연결되었습니다. 등록하시겠습니까?").setContentTitle("WIFI 연결감지").setAutoCancel(true);
+                        notificationManager.notify(3, builder.build());
+                    }
                 }
             }
             @Override
             public void onLost(Network network) {
-                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                notificationManager.cancel(3);
+                if(isPermission()) {
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(3);
+                }
             }
         });
+
 
         return START_STICKY;
     }
 
+    //TODO : 퍼미션 허용안되있으면 노피티 울리면 안댐
+    public boolean isPermission(){
+        boolean ischeck = false;
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+            int ACCESS_FINE_LOCATION_PERMISSION = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+            int ACCESS_COARSE_LOCATION_PERMISSION = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+            if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED)
+                ischeck = true;
+        }
+        return ischeck;
+    }
 
     @Override
     public void onDestroy() {

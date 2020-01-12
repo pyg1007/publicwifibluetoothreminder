@@ -42,8 +42,16 @@ public class MainActivity extends AppCompatActivity {
         TODO : 비정상종료(최근실행 앱에서 종료시 발생)
          */
         runningService = new RunningService(this);
-        if (!runningService.isRunning("com.example.wifibluetoothreminder.Service.UnCatchTaskService"))
-            startService(new Intent(this, UnCatchTaskService.class));
+        //TODO : java-lang-illegalstateexception-not-allowed-to-start-service-inten 에러 가끔 발생 이유 모름.
+        try {
+            if (!runningService.isRunning("com.example.wifibluetoothreminder.Service.UnCatchTaskService"))
+                startService(new Intent(this, UnCatchTaskService.class));
+        }catch (Exception e){
+            e.printStackTrace();
+            //TODO : error 발생시 재시작
+            if (!runningService.isRunning("com.example.wifibluetoothreminder.Service.UnCatchTaskService"))
+                startService(new Intent(this, UnCatchTaskService.class));
+        }
         super.onStart();
     }
 
@@ -54,12 +62,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         UI();
-        WifiStatus();
         checkpermmission();
     }
 
     public void UI(){ //UI들 여기 작성
-
     }
 
     public void checkpermmission(){
@@ -69,6 +75,10 @@ public class MainActivity extends AppCompatActivity {
 
             if ( ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED || ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED)
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},REQUEST_ACCESS_LOCATION);
+            else if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED) {
+                WifiStatus();
+            }
+
         }
     }
 
@@ -95,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             builder.show();
+        }else{
+            WifiStatus();
         }
     }
 
@@ -108,25 +120,42 @@ public class MainActivity extends AppCompatActivity {
         CM.registerNetworkCallback(networkRequest, new ConnectivityManager.NetworkCallback(){
             @Override
             public void onAvailable(Network network) {
-                WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                WifiInfo wifiInfo = WM.getConnectionInfo();
-                StartLog("Connect",wifiInfo.getBSSID());
+                SearchSSID_createDialog();
             }
         });
 
     }
 
+    public void SearchSSID_createDialog(){ // 발견시 추가다이얼로그?
+        WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = WM.getConnectionInfo();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("새로운 기기 감지").setMessage(wifiInfo.getSSID());
+        builder.setPositiveButton("등록", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //TODO : 리사이클러뷰 추가
+            }
+        });
+        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
+    }
+
     public void AutoService(){
         runningService = new RunningService(this);
         if(!runningService.isRunning("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) { // 중복실행 막기위해서 사용
-            StartToast("실행중아님");
             Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);
-            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O)
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O) {
                 startForegroundService(intent);
-            else
+            }
+            else {
                 startService(intent);
-        }else{
-            StartToast("실행중");
+            }
         }
     }
 
@@ -141,7 +170,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         AutoService();
-        StartLog("onDestroy :", "Destroy");
         super.onDestroy();
     }
 }
