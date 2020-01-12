@@ -6,15 +6,28 @@ import android.database.sqlite.SQLiteDatabase;
 public class INSERTDB {
     private Context mcontext;
     //myDBHelper
-    SQLiteDatabase sqlDB;
-    myDBHelper myDBHelper;
-    public void InsertDB_(Context context){
+    private SQLiteDatabase sqlDB;
+    private myDBHelper myDBHelper;
+
+    public void INSERTDB(Context context){
         this.mcontext = context;
+    }
+
+    public void insert(String NickName, String ContentsCount){
         myDBHelper = new myDBHelper(mcontext);
         sqlDB = myDBHelper.getWritableDatabase();
         sqlDB.execSQL("INSERT INTO groupTBL VALUES ( '"
-                + edtName.getText().toString() + "' , '"
-                + edtPlan.getText().toString() + "');");
+                + NickName + "' , '"
+                + ContentsCount + "');");
+        sqlDB.close();
+    }
+
+    public void insert_content(String NickName, String Contents){
+        myDBHelper = new myDBHelper(mcontext);
+        sqlDB = myDBHelper.getWritableDatabase();
+        sqlDB.execSQL("INSERT INTO groupTBL VALUES ( '"
+                + NickName + "' , '"
+                + Contents + "');");
         sqlDB.close();
     }
 }

@@ -4,32 +4,39 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.wifibluetoothreminder.RecyclerView.MainListModel;
+
+import java.util.ArrayList;
+
 public class SELECTDB {
     private Context mcontext;
     //myDBHelper
+    private ArrayList<MainListModel> item;
     SQLiteDatabase sqlDB;
     myDBHelper myDBHelper;
 
-    public void SelectDB_(Context context){
+    public void SELECTDB(Context context, ArrayList<MainListModel> list) {
         this.mcontext = context;
+        this.item = list;
+    }
+
+    public void select(){
         myDBHelper = new myDBHelper(mcontext);
 
         sqlDB = myDBHelper.getReadableDatabase();
         Cursor cursor;
         cursor = sqlDB.rawQuery("SELECT * FROM groupTBL;", null);
 
-        String strNames = "SSID(닉네임)" + "\r\n" + "--------" + "\r\n";
-        String strNumbers = "일정" + "\r\n" + "--------" + "\r\n";
 
         while (cursor.moveToNext()) {
-            strNames += cursor.getString(0) + "\r\n";
-            strNumbers += cursor.getString(1) + "\r\n";
+            item.add(new MainListModel(cursor.getString(0), cursor.getString(1)));
         }
-
-        edtNameResult.setText(strNames);
-        edtPlanResult.setText(strNumbers);
 
         cursor.close();
         sqlDB.close();
+    }
+
+    public void selectContents(){
+
     }
 }

@@ -5,12 +5,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -19,21 +22,35 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.wifibluetoothreminder.CheckingService.RunningService;
+import com.example.wifibluetoothreminder.RecyclerView.MainListModel;
+import com.example.wifibluetoothreminder.RecyclerView.MainRecyclerViewAdapter;
+import com.example.wifibluetoothreminder.SQLite.INITDB;
+import com.example.wifibluetoothreminder.SQLite.myDBHelper;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.Service.UnCatchTaskService;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements MainRecyclerViewAdapter.OnListItemLongClickInterface, MainRecyclerViewAdapter.OnListItemClickInterface{
 
     RunningService runningService;
 
     // 변경되지 않을 상수
     private static final int REQUEST_ACCESS_LOCATION = 1000;
 
+    private ArrayList<MainListModel> list;
+    private RecyclerView recyclerView;
+    private MainRecyclerViewAdapter mainRecyclerViewAdapter;
 
+    private Handler mHandler; // MainThread 아닌곳에서 UI 작업할 수 없기 때문에 핸들러 제작
+
+    private SQLiteDatabase sqLiteDatabase;
 
     @Override
     protected void onStart() {
@@ -66,6 +83,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void UI(){ //UI들 여기 작성
+
+        list = new ArrayList<>();
+        //TODO : recyclerView Init
+        recyclerView = findViewById(R.id.WIFINameList);
+        recyclerView.setHasFixedSize(true);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        mainRecyclerViewAdapter = new MainRecyclerViewAdapter(list, MainActivity.this, MainActivity.this);
+        recyclerView.setAdapter(mainRecyclerViewAdapter);
+
+        mHandler = new Handler();
     }
 
     public void checkpermmission(){
@@ -128,13 +158,21 @@ public class MainActivity extends AppCompatActivity {
 
     public void SearchSSID_createDialog(){ // 발견시 추가다이얼로그?
         WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = WM.getConnectionInfo();
+        final WifiInfo wifiInfo = WM.getConnectionInfo();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("새로운 기기 감지").setMessage(wifiInfo.getSSID());
         builder.setPositiveButton("등록", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //TODO : 리사이클러뷰 추가
+                list.add(new MainListModel(wifiInfo.getSSID(), "0"));
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mHandler.sendEmptyMessage(1000);
+                    }
+                }).start();
+                dialogInterface.dismiss();
             }
         });
         builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -144,6 +182,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         builder.show();
+
+    }
+
+    public void DB(){
+        myDBHelper mDBhelper = new myDBHelper(this);
+
+        INITDB initdb = new INITDB(this);
+        initdb.init();
+
+
     }
 
     public void AutoService(){
@@ -171,5 +219,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         AutoService();
         super.onDestroy();
+    }
+
+    @Override
+    public void onItemLongClick(View v, int position) {
+        MainRecyclerViewAdapter.CoustomViewHolder viewHolder = (MainRecyclerViewAdapter.CoustomViewHolder)recyclerView.findViewHolderForAdapterPosition(position);
+        StartToast(viewHolder.NickName.getText().toString());
+    }
+
+    @Override
+    public void onItemClick(View v, int position) {
+        MainRecyclerViewAdapter.CoustomViewHolder viewHolder = (MainRecyclerViewAdapter.CoustomViewHolder)recyclerView.findViewHolderForAdapterPosition(position);
+        StartToast(viewHolder.NickName.getText().toString());
+    }
+
+    public class Handler extends android.os.Handler{ // TODO : 여기서 UI 작업
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == 1000){
+                mainRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        }
     }
 }

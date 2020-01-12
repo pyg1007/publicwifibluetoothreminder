@@ -11,8 +11,11 @@ public class UPDATEDB {
     SQLiteDatabase sqlDB;
     myDBHelper myDBHelper;
 
-    public void UpdateDB_(Context context){
+    public void UPDATEDB(Context context) {
         this.mcontext = context;
+    }
+    /*
+    public void update(){
         myDBHelper = new myDBHelper(mcontext);
         sqlDB = myDBHelper.getWritableDatabase();
         if (edtName.getText().toString() != "") {
@@ -24,4 +27,6 @@ public class UPDATEDB {
 
         btnSelect.callOnClick();
     }
+
+     */
 }
