@@ -30,8 +30,7 @@ import android.widget.Toast;
 import com.example.wifibluetoothreminder.CheckingService.RunningService;
 import com.example.wifibluetoothreminder.RecyclerView.MainListModel;
 import com.example.wifibluetoothreminder.RecyclerView.MainRecyclerViewAdapter;
-import com.example.wifibluetoothreminder.SQLite.INITDB;
-import com.example.wifibluetoothreminder.SQLite.myDBHelper;
+import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.Service.UnCatchTaskService;
 
@@ -51,6 +50,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private Handler mHandler; // MainThread 아닌곳에서 UI 작업할 수 없기 때문에 핸들러 제작
 
     private SQLiteDatabase sqLiteDatabase;
+
+
+    private DbOpenHelper mDbOpenHelper;
+
+
 
     @Override
     protected void onStart() {
@@ -78,6 +82,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mDbOpenHelper = new DbOpenHelper(this);
+
+        mDbOpenHelper.open();
+
+        mDbOpenHelper.create();
         UI();
         checkpermmission();
     }
@@ -157,6 +166,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     }
 
     public void SearchSSID_createDialog(){ // 발견시 추가다이얼로그?
+
         WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         final WifiInfo wifiInfo = WM.getConnectionInfo();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -166,10 +176,15 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             public void onClick(DialogInterface dialogInterface, int i) {
                 //TODO : 리사이클러뷰 추가
                 list.add(new MainListModel(wifiInfo.getSSID(), "0"));
+                String NICKNAME2;
+                NICKNAME2 = wifiInfo.getSSID().toString();
+                mDbOpenHelper.open();
+                mDbOpenHelper.insertColumn(NICKNAME2);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         mHandler.sendEmptyMessage(1000);
+
                     }
                 }).start();
                 dialogInterface.dismiss();
@@ -182,15 +197,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             }
         });
         builder.show();
-
-    }
-
-    public void DB(){
-        myDBHelper mDBhelper = new myDBHelper(this);
-
-        INITDB initdb = new INITDB(this);
-        initdb.init();
-
 
     }
 
