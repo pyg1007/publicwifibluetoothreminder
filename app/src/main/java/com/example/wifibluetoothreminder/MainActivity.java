@@ -25,7 +25,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.example.wifibluetoothreminder.CheckingService.RunningService;
@@ -228,8 +231,34 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     }
 
     @Override
-    public void onItemLongClick(View v, int position) {
-        MainRecyclerViewAdapter.CoustomViewHolder viewHolder = (MainRecyclerViewAdapter.CoustomViewHolder)recyclerView.findViewHolderForAdapterPosition(position);
+    public void onItemLongClick(View v, final int position) {
+        PopupMenu popupMenu = new PopupMenu(this, v , Gravity.RIGHT);
+        getMenuInflater().inflate(R.menu.item_menu, popupMenu.getMenu());
+        MainRecyclerViewAdapter.CoustomViewHolder viewHolder = (MainRecyclerViewAdapter.CoustomViewHolder)recyclerView.findViewHolderForAdapterPosition(position); // 선택아이템 포지션 알아옴
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.edit: // 편집
+                        //TODO : 업데이트문 실행
+                        /**
+                         * viewHolder.NickName.getText().toString() 하면 NickName값 알아옴 이걸 이용
+                         */
+                        MainListModel mainListModel = new MainListModel("",""); // 이부분에서 바꿀내용 지정
+                        list.set(position, mainListModel);
+                        mainRecyclerViewAdapter.notifyItemChanged(position);
+                        break;
+                    case R.id.del: //삭제
+                        //TODO : 딜리트문 실행
+                        list.remove(position);
+                        mainRecyclerViewAdapter.notifyItemRemoved(position);
+                        mainRecyclerViewAdapter.notifyDataSetChanged();
+                        break;
+                }
+                return false;
+            }
+        });
+
         StartToast(viewHolder.NickName.getText().toString());
     }
 
