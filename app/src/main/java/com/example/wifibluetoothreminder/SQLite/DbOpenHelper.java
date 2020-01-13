@@ -29,11 +29,20 @@ public class DbOpenHelper {
         }
 
         @Override
+        public void onOpen(SQLiteDatabase db) {
+            super.onOpen(db);
+            if (!db.isReadOnly()) {
+                // Enable foreign key constraints
+                db.execSQL("PRAGMA foreign_keys=ON;");
+            }
+        }
+
+        @Override
 
         public void onCreate(SQLiteDatabase db){
 
             db.execSQL(DataBases.CreateDB._CREATE0);
-
+            db.execSQL(DataBases.CreateDB2._CREATE1);
         }
 
 
@@ -41,6 +50,8 @@ public class DbOpenHelper {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
             db.execSQL("DROP TABLE IF EXISTS "+DataBases.CreateDB._TABLENAME0);
+
+            db.execSQL("DROP TABLE IF EXISTS " + DataBases.CreateDB2._TABLENAME1);
 
             onCreate(db);
 
@@ -84,6 +95,10 @@ public class DbOpenHelper {
         values.put(DataBases.CreateDB.NAME, name);
 
         values.put(DataBases.CreateDB.USERID, userid);
+
+        values.put(DataBases.CreateDB2.USERID, userid);
+
+        values.put(DataBases.CreateDB2.NAME, name);
 /*
         values.put(DataBases.CreateDB.NAME, name);
 
@@ -106,6 +121,10 @@ public class DbOpenHelper {
 
         values.put(DataBases.CreateDB.NAME, name);
 
+        values.put(DataBases.CreateDB2.USERID, userid);
+
+        values.put(DataBases.CreateDB2.NAME, name);
+
         return mDB.update(DataBases.CreateDB._TABLENAME0, values, "_id=" + id, null) > 0;
 
     }
@@ -117,7 +136,7 @@ public class DbOpenHelper {
     public void deleteAllColumns() {
 
         mDB.delete(DataBases.CreateDB._TABLENAME0, null, null);
-
+        mDB.delete(DataBases.CreateDB2._TABLENAME1, null, null);
     }
 
 
@@ -132,11 +151,16 @@ public class DbOpenHelper {
 
     // Select DB
 
-    public Cursor selectColumns(){
+    public Cursor selectColumns() {
 
         return mDB.query(DataBases.CreateDB._TABLENAME0, null, null, null, null, null, null);
-
     }
+
+    public Cursor selectColumns2() {
+
+        return mDB.query(DataBases.CreateDB2._TABLENAME1, null, null, null, null, null, null);
+    }
+
 
 
 

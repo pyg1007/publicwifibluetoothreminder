@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 return false;
             }
         });
-
+        popupMenu.show();
         StartToast(viewHolder.NickName.getText().toString());
     }
 
