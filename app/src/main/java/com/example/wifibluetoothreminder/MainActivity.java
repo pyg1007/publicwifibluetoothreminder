@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -64,15 +65,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
          */
         runningService = new RunningService(this);
         //TODO : java-lang-illegalstateexception-not-allowed-to-start-service-inten 에러 가끔 발생 이유 모름.
-        try {
-            if (!runningService.isRunning("com.example.wifibluetoothreminder.Service.UnCatchTaskService"))
-                startService(new Intent(this, UnCatchTaskService.class));
-        }catch (Exception e){
-            e.printStackTrace();
-            //TODO : error 발생시 재시작
-            if (!runningService.isRunning("com.example.wifibluetoothreminder.Service.UnCatchTaskService"))
-                startService(new Intent(this, UnCatchTaskService.class));
+
+        if (!runningService.isRunning("com.example.wifibluetoothreminder.Service.UnCatchTaskService")) {
+            startService(new Intent(this, UnCatchTaskService.class));
         }
+
         super.onStart();
     }
 
@@ -176,10 +173,13 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             public void onClick(DialogInterface dialogInterface, int i) {
                 //TODO : 리사이클러뷰 추가
                 list.add(new MainListModel(wifiInfo.getSSID(), "0"));
-                String NICKNAME2;
-                NICKNAME2 = wifiInfo.getSSID().toString();
                 mDbOpenHelper.open();
-                mDbOpenHelper.insertColumn(NICKNAME2);
+                mDbOpenHelper.insertColumn(wifiInfo.getSSID(), wifiInfo.getSSID());
+                Cursor cursor = mDbOpenHelper.selectColumns();
+                while(cursor.moveToNext()){
+                    String Nick = cursor.getString(1);
+                    StartLog("DB : ", Nick);
+                }
                 new Thread(new Runnable() {
                     @Override
                     public void run() {

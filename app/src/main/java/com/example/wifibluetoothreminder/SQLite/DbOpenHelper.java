@@ -78,13 +78,13 @@ public class DbOpenHelper {
 
     // Insert DB
 
-    public long insertColumn(String name){
+    public long insertColumn(String userid, String name){
 
         ContentValues values = new ContentValues();
         values.put(DataBases.CreateDB.NAME, name);
-/*
-        values.put(DataBases.CreateDB.USERID, userid);
 
+        values.put(DataBases.CreateDB.USERID, userid);
+/*
         values.put(DataBases.CreateDB.NAME, name);
 
         values.put(DataBases.CreateDB.CONTENTS, Contents);
