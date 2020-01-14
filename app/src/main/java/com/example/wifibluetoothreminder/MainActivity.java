@@ -32,6 +32,7 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.example.wifibluetoothreminder.CheckingService.RunningService;
+import com.example.wifibluetoothreminder.CustomDialog.MainListDialog;
 import com.example.wifibluetoothreminder.RecyclerView.MainListModel;
 import com.example.wifibluetoothreminder.RecyclerView.MainRecyclerViewAdapter;
 import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
@@ -52,9 +53,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private MainRecyclerViewAdapter mainRecyclerViewAdapter;
 
     private Handler mHandler; // MainThread 아닌곳에서 UI 작업할 수 없기 때문에 핸들러 제작
-
-    private SQLiteDatabase sqLiteDatabase;
-
 
     private DbOpenHelper mDbOpenHelper;
 
@@ -96,10 +94,17 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         list = new ArrayList<>();
         //TODO : recyclerView Init
         recyclerView = findViewById(R.id.WIFINameList);
-        recyclerView.setHasFixedSize(true);
+        //recyclerView.setHasFixedSize(true);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
+
+        Cursor cursor = mDbOpenHelper.selectColumns();
+        while(cursor.moveToNext()){
+            list.add(new MainListModel(cursor.getString(1), cursor.getString(2)));
+        }
+
+        StartLog("ListSize :", String.valueOf(list.size()));
 
         mainRecyclerViewAdapter = new MainRecyclerViewAdapter(list, MainActivity.this, MainActivity.this);
         recyclerView.setAdapter(mainRecyclerViewAdapter);
@@ -165,42 +170,56 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
     }
 
+    public boolean isExist(){
+        boolean exist = false;
+        WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = WM.getConnectionInfo();
+
+        for(int i = 0; i<list.size(); i++){
+            if(wifiInfo.getSSID().equals(list.get(i).getNickName())){
+                exist = true;
+                break;
+            }
+        }
+        return exist;
+    }
+
     public void SearchSSID_createDialog(){ // 발견시 추가다이얼로그?
 
         WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         final WifiInfo wifiInfo = WM.getConnectionInfo();
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("새로운 기기 감지").setMessage(wifiInfo.getSSID());
-        builder.setPositiveButton("등록", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //TODO : 리사이클러뷰 추가
-                list.add(new MainListModel(wifiInfo.getSSID(), "0"));
-                mDbOpenHelper.open();
-                mDbOpenHelper.insertColumn(wifiInfo.getSSID(), wifiInfo.getSSID());
-                Cursor cursor = mDbOpenHelper.selectColumns();
-                while(cursor.moveToNext()){
-                    String Nick = cursor.getString(1);
-                    StartLog("DB : ", Nick);
-                }
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mHandler.sendEmptyMessage(1000);
-
+        if (!isExist()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("새로운 기기 감지").setMessage(wifiInfo.getSSID());
+            builder.setPositiveButton("등록", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    //TODO : 리사이클러뷰 추가
+                    mDbOpenHelper.open();
+                    mDbOpenHelper.insertColumn(wifiInfo.getSSID(), wifiInfo.getSSID());
+                    list.clear();
+                    Cursor cursor = mDbOpenHelper.selectColumns();
+                    while (cursor.moveToNext()) {
+                        list.add(new MainListModel(cursor.getString(1), cursor.getString(2)));
                     }
-                }).start();
-                dialogInterface.dismiss();
-            }
-        });
-        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        builder.show();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mHandler.sendEmptyMessage(1000);
 
+                        }
+                    }).start();
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.show();
+        }
     }
 
     public void AutoService(){
@@ -230,6 +249,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         super.onDestroy();
     }
 
+
+
+    // TODO : 리사이클러뷰 클릭 이벤트
     @Override
     public void onItemLongClick(View v, final int position) {
         PopupMenu popupMenu = new PopupMenu(this, v , Gravity.RIGHT);
@@ -240,17 +262,28 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.edit: // 편집
-                        //TODO : 업데이트문 실행
-                        /**
-                         * viewHolder.NickName.getText().toString() 하면 NickName값 알아옴 이걸 이용
-                         */
-                        MainListModel mainListModel = new MainListModel("",""); // 이부분에서 바꿀내용 지정
-                        list.set(position, mainListModel);
-                        mainRecyclerViewAdapter.notifyItemChanged(position);
+                        MainListDialog mainListDialog = new MainListDialog(MainActivity.this);
+                        mainListDialog.setCancelable(false);
+                        mainListDialog.setDialogListener(new MainListDialog.CustomDialogListener() {
+                            @Override
+                            public void PositiveClick(String NickName) {
+                                //TODO : 업데이트문 실행
+
+                                MainListModel mainListModel = new MainListModel(NickName,"갯수"); // 이부분에서 바꿀내용 지정
+                                list.set(position, mainListModel); // 이부분도 필요없음 걍 업데이트 후 clear 셀렉트해서 다시담으면 끝
+                                mainRecyclerViewAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void NegativeClick() {
+
+                            }
+                        });
+                        mainListDialog.show();
                         break;
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
-                        list.remove(position);
+                        list.remove(position);//여기도 동일
                         mainRecyclerViewAdapter.notifyItemRemoved(position);
                         mainRecyclerViewAdapter.notifyDataSetChanged();
                         break;
@@ -265,7 +298,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     @Override
     public void onItemClick(View v, int position) {
         MainRecyclerViewAdapter.CoustomViewHolder viewHolder = (MainRecyclerViewAdapter.CoustomViewHolder)recyclerView.findViewHolderForAdapterPosition(position);
-        StartToast(viewHolder.NickName.getText().toString());
+        Intent intent = new Intent(MainActivity.this, Contents.class);
+        intent.putExtra("SSID", viewHolder.NickName.getText().toString());
+        startActivity(intent);
     }
 
     public class Handler extends android.os.Handler{ // TODO : 여기서 UI 작업
