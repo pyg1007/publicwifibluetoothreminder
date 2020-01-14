@@ -83,7 +83,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
     @Override
     public void onItemClick(View v, int position) {
-
+        ContentsModelAdapter.CustomViewHoler customViewHoler = (ContentsModelAdapter.CustomViewHoler)recyclerView.findViewHolderForAdapterPosition(position);
     }
     // 여기까지 리스트 클릭이벤트
 

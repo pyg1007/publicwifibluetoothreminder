@@ -94,15 +94,18 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         list = new ArrayList<>();
         //TODO : recyclerView Init
         recyclerView = findViewById(R.id.WIFINameList);
-        //recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
         Cursor cursor = mDbOpenHelper.selectColumns();
         while(cursor.moveToNext()){
+            StartLog("A" , cursor.getString(1));
             list.add(new MainListModel(cursor.getString(1), cursor.getString(2)));
         }
+
+        cursor.close();
 
         StartLog("ListSize :", String.valueOf(list.size()));
 
@@ -202,6 +205,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                     while (cursor.moveToNext()) {
                         list.add(new MainListModel(cursor.getString(1), cursor.getString(2)));
                     }
+                    cursor.close();
                     new Thread(new Runnable() {
                         @Override
                         public void run() {

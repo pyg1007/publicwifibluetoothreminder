@@ -8,10 +8,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 
@@ -21,9 +24,15 @@ import androidx.core.content.ContextCompat;
 
 import com.example.wifibluetoothreminder.MainActivity;
 import com.example.wifibluetoothreminder.R;
+import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
+
+import java.util.ArrayList;
 
 public class BluetoothWifiService extends Service {
 
+    private ArrayList<String> itemlist;
+
+    private DbOpenHelper dbOpenHelper;
 
     public BluetoothWifiService() {
     }
@@ -62,6 +71,32 @@ public class BluetoothWifiService extends Service {
         startForeground(2,builder.build());
     }
 
+    public void initlist(){
+        itemlist = new ArrayList<>();
+
+        dbOpenHelper = new DbOpenHelper(this);
+        dbOpenHelper.open();
+        dbOpenHelper.create();
+
+        Cursor cursor = dbOpenHelper.selectColumns();
+        
+        while(cursor.moveToNext())
+            itemlist.add(cursor.getString(1));
+        
+        cursor.close();
+    }
+
+    public boolean isExist(){
+        boolean exist = false;
+        initlist();
+        WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = WM.getConnectionInfo();
+
+        if (itemlist.contains(wifiInfo.getSSID()))
+            exist = true;
+        return exist;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //TODO : Service 최초 시작시 할 일
@@ -76,7 +111,7 @@ public class BluetoothWifiService extends Service {
 
             @Override
             public void onAvailable(Network network) {
-                if(isPermission()) {
+                if(isPermission() && !isExist()) {
                     Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     PendingIntent pendingIntent = PendingIntent.getActivity(BluetoothWifiService.this, 0, intent, 0); // 노티피 클릭시 이동할 수 있는 인텐트
@@ -98,7 +133,7 @@ public class BluetoothWifiService extends Service {
             }
             @Override
             public void onLost(Network network) {
-                if(isPermission()) {
+                if(isPermission() && !isExist()) {
                     NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.cancel(3);
                 }
