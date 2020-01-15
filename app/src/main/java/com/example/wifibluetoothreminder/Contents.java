@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.example.wifibluetoothreminder.CustomDialog.ContentDialog;
 import com.example.wifibluetoothreminder.RecyclerView.ContentsModel;
 import com.example.wifibluetoothreminder.RecyclerView.ContentsModelAdapter;
 import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
@@ -52,10 +53,8 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
         Cursor cursor = mDbOpenHelper.selectColumns2();
         while(cursor.moveToNext()){
-            item.add(new ContentsModel(cursor.getString(1))); //임시지정
+            item.add(new ContentsModel(cursor.getString(1), cursor.getString(2))); //임시지정
         }
-
-        item.add(new ContentsModel("TEST"));
 
         contentsModelAdapter = new ContentsModelAdapter(item,Contents.this,Contents.this);
         recyclerView.setAdapter(contentsModelAdapter);
@@ -91,7 +90,21 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.Add:
+                ContentDialog dialog = new ContentDialog(Contents.this);
+                dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
+                    @Override
+                    public void PositiveClick(String Contents) {
+                        item.add(new ContentsModel(SSID,Contents));
+                        mDbOpenHelper.insertColumn2(SSID, Contents);
+                        contentsModelAdapter.notifyDataSetChanged();
+                    }
 
+                    @Override
+                    public void NegativeClick() {
+
+                    }
+                });
+                dialog.show();
                 break;
         }
     }

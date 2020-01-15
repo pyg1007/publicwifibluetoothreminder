@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CustomDialog.MainListDialog"></activity>
+        <activity android:name=".CustomDialog.ContentDialog"></activity>
+        <activity android:name=".CustomDialog.MainListDialog" />
         <activity android:name=".Contents" />
 
         <service

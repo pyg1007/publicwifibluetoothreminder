@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         Cursor cursor = mDbOpenHelper.selectColumns();
         while(cursor.moveToNext()){
             StartLog("A" , cursor.getString(1));
-            list.add(new MainListModel(cursor.getString(1), cursor.getString(2)));
+            list.add(new MainListModel("WIFI",cursor.getString(2), cursor.getString(3)));
         }
 
         cursor.close();
@@ -199,11 +199,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 public void onClick(DialogInterface dialogInterface, int i) {
                     //TODO : 리사이클러뷰 추가
                     mDbOpenHelper.open();
-                    mDbOpenHelper.insertColumn(wifiInfo.getSSID(), wifiInfo.getSSID());
+                    mDbOpenHelper.insertColumn("WIFI",wifiInfo.getSSID(), wifiInfo.getSSID());
                     list.clear();
                     Cursor cursor = mDbOpenHelper.selectColumns();
                     while (cursor.moveToNext()) {
-                        list.add(new MainListModel(cursor.getString(1), cursor.getString(2)));
+                        list.add(new MainListModel(cursor.getString(1), cursor.getString(2),cursor.getString(cursor.getColumnIndex("nickname"))));
                     }
                     cursor.close();
                     new Thread(new Runnable() {
@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                             public void PositiveClick(String NickName) {
                                 //TODO : 업데이트문 실행
 
-                                MainListModel mainListModel = new MainListModel(NickName,"갯수"); // 이부분에서 바꿀내용 지정
+                                MainListModel mainListModel = new MainListModel("WIFI",NickName,"갯수"); // 이부분에서 바꿀내용 지정
                                 list.set(position, mainListModel); // 이부분도 필요없음 걍 업데이트 후 clear 셀렉트해서 다시담으면 끝
                                 mainRecyclerViewAdapter.notifyDataSetChanged();
                             }

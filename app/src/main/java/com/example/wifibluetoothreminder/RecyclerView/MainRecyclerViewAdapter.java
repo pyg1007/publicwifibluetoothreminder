@@ -39,12 +39,14 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
         public TextView NickName;
         public TextView ContentsCount;
+        public TextView DeviceName;
 
         public CoustomViewHolder(View view){
             super(view);
 
             NickName = view.findViewById(R.id.NickName);
             ContentsCount = view.findViewById(R.id.ContentCount);
+            DeviceName = view.findViewById(R.id.devicename);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -86,6 +88,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public void onBindViewHolder(@NonNull MainRecyclerViewAdapter.CoustomViewHolder holder, int position) {
         holder.NickName.setText(itemList.get(position).getNickName());
         holder.ContentsCount.setText(itemList.get(position).getContentsCount());
+        holder.DeviceName.setText(itemList.get(position).getDevice()); // 여기서이미지?
     }
 
     @Override

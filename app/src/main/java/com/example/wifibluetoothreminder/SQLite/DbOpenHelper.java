@@ -7,6 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 
 public class DbOpenHelper {
@@ -40,7 +41,6 @@ public class DbOpenHelper {
         @Override
 
         public void onCreate(SQLiteDatabase db){
-
             db.execSQL(DataBases.CreateDB._CREATE0);
             db.execSQL(DataBases.CreateDB2._CREATE1);
         }
@@ -89,26 +89,31 @@ public class DbOpenHelper {
 
     // Insert DB
 
-    public long insertColumn(String userid, String name){
+    public long insertColumn(String Kind_device, String ssid, String nickname){
 
         ContentValues values = new ContentValues();
-        values.put(DataBases.CreateDB.NAME, name);
+        values.put(DataBases.CreateDB.DEVICE, Kind_device);
 
-        values.put(DataBases.CreateDB.USERID, userid);
+        values.put(DataBases.CreateDB.NICKNAME, nickname);
 
-        values.put(DataBases.CreateDB2.USERID, userid);
+        values.put(DataBases.CreateDB.SSID, ssid);
 
-        values.put(DataBases.CreateDB2.NAME, name);
-/*
-        values.put(DataBases.CreateDB.NAME, name);
-
-        values.put(DataBases.CreateDB.CONTENTS, Contents);
-*/
 
         return mDB.insert(DataBases.CreateDB._TABLENAME0, null, values);
-
     }
 
+    public long insertColumn2(String ssid, String contents){
+
+        ContentValues values = new ContentValues();
+
+
+        values.put(DataBases.CreateDB2.SSID, ssid);
+
+        values.put(DataBases.CreateDB2.CONTENT,contents);
+
+
+        return mDB.insert(DataBases.CreateDB2._TABLENAME1, null, values);
+    }
 
 
     // Update DB
@@ -117,13 +122,9 @@ public class DbOpenHelper {
 
         ContentValues values = new ContentValues();
 
-        values.put(DataBases.CreateDB.USERID, userid);
+        values.put(DataBases.CreateDB.SSID, userid);
 
-        values.put(DataBases.CreateDB.NAME, name);
-
-        values.put(DataBases.CreateDB2.USERID, userid);
-
-        values.put(DataBases.CreateDB2.NAME, name);
+        values.put(DataBases.CreateDB.NICKNAME, name);
 
         return mDB.update(DataBases.CreateDB._TABLENAME0, values, "_id=" + id, null) > 0;
 
