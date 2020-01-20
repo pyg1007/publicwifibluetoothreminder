@@ -4,8 +4,11 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- WIFI SSID를 알려면 필요한 위치권한 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- WIFI SSID를 알려면 필요한 위치권한 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -13,22 +16,39 @@
 
 
     <application
-        android:allowBackup="true"
         android:name=".MyApp"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <receiver
+            android:name=".Reboot"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".Service.RestartService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver android:name=".AlarmReceiver" />
+
+        <service
+            android:name=".Service.MyService"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity android:name=".CustomDialog.ContentDialog" />
         <activity android:name=".CustomDialog.MainListDialog" />
         <activity android:name=".Contents" />
 
-        <service
-            android:name=".Service.UnCatchTaskService"
-            android:enabled="true"
-            android:exported="true"
-            android:stopWithTask="false" />
         <service
             android:name=".Service.BluetoothWifiService"
             android:enabled="true"
