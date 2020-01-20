@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.wifibluetoothreminder">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!-- WIFI SSID를 알려면 필요한 위치권한 -->
@@ -10,12 +11,13 @@
 
     <application
         android:allowBackup="true"
+        android:name=".MyApp"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CustomDialog.ContentDialog"></activity>
+        <activity android:name=".CustomDialog.ContentDialog" />
         <activity android:name=".CustomDialog.MainListDialog" />
         <activity android:name=".Contents" />
 

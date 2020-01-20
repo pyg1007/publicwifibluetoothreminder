@@ -1,4 +1,4 @@
-package com.example.wifibluetoothreminder.CheckingService;
+package com.example.wifibluetoothreminder.RunningCheck;
 
 import android.app.ActivityManager;
 import android.content.Context;

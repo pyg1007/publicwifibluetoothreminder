@@ -6,7 +6,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.example.wifibluetoothreminder.CheckingService.RunningService;
+import com.example.wifibluetoothreminder.RunningCheck.RunningService;
 
 public class UnCatchTaskService extends Service {
     public UnCatchTaskService() {

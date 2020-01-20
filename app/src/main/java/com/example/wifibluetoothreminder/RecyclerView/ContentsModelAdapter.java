@@ -1,6 +1,7 @@
 package com.example.wifibluetoothreminder.RecyclerView;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,7 +75,14 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
 
     @Override
     public void onBindViewHolder(@NonNull ContentsModelAdapter.CustomViewHoler holder, int position) {
-        holder.ContentView.setText(list.get(position).getContents());
+        for (int i = 0; i<list.get(position).getContents().length(); i++) {
+//            Log.e("TAG : ", String.valueOf(i));
+//            if (holder.ContentView.getPaint().measureText(list.get(position).getContents().substring(0, i + 1), 0, list.get(position).getContents().length()) >= 320.0f) {
+//                holder.ContentView.setText(list.get(position).getContents().substring(0, i) + "...");
+//                break;
+//            }else
+                holder.ContentView.setText(list.get(position).getContents().substring(0,i+1));
+        }
     }
 
 

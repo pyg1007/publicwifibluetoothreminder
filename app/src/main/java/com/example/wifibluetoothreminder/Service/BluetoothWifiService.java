@@ -81,7 +81,7 @@ public class BluetoothWifiService extends Service {
         Cursor cursor = dbOpenHelper.selectColumns();
         
         while(cursor.moveToNext())
-            itemlist.add(cursor.getString(1));
+            itemlist.add(cursor.getString(2));
         
         cursor.close();
     }
