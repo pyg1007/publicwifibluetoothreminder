@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 
 import com.example.wifibluetoothreminder.R;
 
-public class MainListDialog extends Dialog implements View.OnClickListener{
+public class NickNameDialog extends Dialog implements View.OnClickListener{
 
     private Context context;
 
@@ -32,7 +32,7 @@ public class MainListDialog extends Dialog implements View.OnClickListener{
         this.customDialogListener = customDialogListener;
     }
 
-    public MainListDialog(@NonNull Context context) {
+    public NickNameDialog(@NonNull Context context) {
         super(context);
         this.context= context;
     }

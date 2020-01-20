@@ -23,6 +23,9 @@ public class BluetoothService extends AppCompatActivity {
 
     int selectDevice;
 
+    public BluetoothService(){
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

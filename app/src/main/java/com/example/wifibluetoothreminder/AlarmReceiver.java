@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-import com.example.wifibluetoothreminder.Service.MyService;
+import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.Service.RestartService;
 
 public class AlarmReceiver extends BroadcastReceiver {
@@ -17,7 +17,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             Intent in = new Intent(context, RestartService.class);
             context.startForegroundService(in);
         } else {
-            Intent in = new Intent(context, MyService.class);
+            Intent in = new Intent(context, BluetoothWifiService.class);
             context.startService(in);
         }
     }

@@ -70,7 +70,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(Contents.this, MainActivity.class));
         super.onBackPressed();
     }
 

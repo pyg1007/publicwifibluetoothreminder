@@ -41,18 +41,13 @@
         <receiver android:name=".AlarmReceiver" />
 
         <service
-            android:name=".Service.MyService"
+            android:name=".Service.BluetoothWifiService"
             android:enabled="true"
             android:exported="true" />
 
         <activity android:name=".CustomDialog.ContentDialog" />
-        <activity android:name=".CustomDialog.MainListDialog" />
+        <activity android:name=".CustomDialog.NickNameDialog" />
         <activity android:name=".Contents" />
-
-        <service
-            android:name=".Service.BluetoothWifiService"
-            android:enabled="true"
-            android:exported="true" />
 
         <activity android:name=".MainActivity">
             <intent-filter>

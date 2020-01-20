@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
@@ -49,7 +48,7 @@ public class RestartService extends Service {
         startForeground(9, notification);
 
         /////////////////////////////////////////////////////////////////////
-        Intent in = new Intent(this, MyService.class);
+        Intent in = new Intent(this, BluetoothWifiService.class);
         startService(in);
 
         stopForeground(true);

@@ -9,21 +9,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
 import android.net.Uri;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
@@ -32,20 +22,14 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.example.wifibluetoothreminder.CustomDialog.MainListDialog;
+import com.example.wifibluetoothreminder.CustomDialog.NickNameDialog;
 import com.example.wifibluetoothreminder.RecyclerView.MainListModel;
 import com.example.wifibluetoothreminder.RecyclerView.MainRecyclerViewAdapter;
 import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
-<<<<<<< HEAD
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
-import com.example.wifibluetoothreminder.Service.BluetoothService;
-=======
-import com.example.wifibluetoothreminder.Service.MyService;
->>>>>>> 4543f1541ffb3606c4c6ffa0cdabf82d3066c466
 
 import java.util.ArrayList;
 
@@ -60,37 +44,22 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private MainRecyclerViewAdapter mainRecyclerViewAdapter;
     private Intent foregroundIntent = null;
 
-    private BluetoothService bluetoothService;
     private Handler mHandler; // MainThread 아닌곳에서 UI 작업할 수 없기 때문에 핸들러 제작
 
     private DbOpenHelper mDbOpenHelper;
 
-    private String Device_Type = "";
+    private String Detect_Type = "";
+    private String SSID = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDbOpenHelper = new DbOpenHelper(this);
-        mDbOpenHelper.open();
-        mDbOpenHelper.create();
-
+        checkpermmission();
         AutoService();
         UI();
-
-        checkpermmission();
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
+        notiDataCheck();
     }
 
     public void UI(){ //UI들 여기 작성
@@ -100,22 +69,38 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         recyclerView = findViewById(R.id.WIFINameList);
         recyclerView.setHasFixedSize(true);
 
-
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        Cursor cursor = mDbOpenHelper.selectColumns();
-        while(cursor.moveToNext()){
-            list.add(new MainListModel("WIFI",cursor.getString(2), cursor.getString(3)));
-        }
-
-        cursor.close();
+        SelectAllDB();
 
         mainRecyclerViewAdapter = new MainRecyclerViewAdapter(list, MainActivity.this, MainActivity.this);
         recyclerView.setAdapter(mainRecyclerViewAdapter);
 
         mHandler = new Handler();
+    }
+
+    public void notiDataCheck(){ // 노티로 접근시 작동
+        Bundle extra = getIntent().getExtras();
+
+        if(extra != null){
+            Detect_Type = extra.getString("DetectType");
+            SSID = extra.getString("SSID");
+
+            list.add(new MainListModel(Detect_Type, SSID, "Count"));
+        }
+    }
+
+    public void SelectAllDB(){
+        mDbOpenHelper = new DbOpenHelper(this);
+        mDbOpenHelper.open();
+        mDbOpenHelper.create();
+        Cursor cursor = mDbOpenHelper.selectColumns();
+        while(cursor.moveToNext()){
+            list.add(new MainListModel("WIFI",cursor.getString(2), cursor.getString(3)));
+        }
+        cursor.close();
+        mDbOpenHelper.close();
     }
 
     public void checkpermmission(){
@@ -125,10 +110,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
             if ( ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED || ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED)
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},REQUEST_ACCESS_LOCATION);
-            else if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED) {
-                WifiStatus();
-            }
-
         }
     }
 
@@ -155,100 +136,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 }
             });
             builder.show();
-        }else{
-            WifiStatus();
-        }
-    }
-
-    public void WifiStatus(){
-        ConnectivityManager CM = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkRequest networkRequest = new NetworkRequest.Builder()
-                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .build();
-
-        CM.registerNetworkCallback(networkRequest, new ConnectivityManager.NetworkCallback(){
-            @Override
-            public void onAvailable(Network network) {
-                SearchSSID_createDialog();
-            }
-        });
-
-    }
-
-    public boolean isExist(){
-        boolean exist = false;
-        WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = WM.getConnectionInfo();
-
-        for(int i = 0; i<list.size(); i++){
-            if(wifiInfo.getSSID().equals(list.get(i).getNickName())){
-                exist = true;
-                break;
-            }
-        }
-        return exist;
-    }
-
-    public void SearchSSID_createDialog(){ // 발견시 추가다이얼로그?
-
-        WifiManager WM = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        final WifiInfo wifiInfo = WM.getConnectionInfo();
-        if (!isExist()) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("새로운 기기 감지").setMessage(wifiInfo.getSSID());
-            builder.setPositiveButton("등록", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    final EditText editText = new EditText(MainActivity.this);
-                    editText.setHint("설정하지 않으면 Wifi이름으로 설정됩니다.");
-                    AlertDialog.Builder Nick = new AlertDialog.Builder(MainActivity.this);
-                    Nick.setView(editText).setCancelable(false).setTitle("이름 설정");
-                    Nick.setPositiveButton("등록", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            //TODO : 리사이클러뷰 추가
-                            StartLog("TAG : ", editText.getText().toString());
-                            if(!editText.getText().equals(""))
-                                mDbOpenHelper.insertColumn("WIFI",editText.getText().toString(), wifiInfo.getSSID());
-                            else
-                                mDbOpenHelper.insertColumn("WIFI",wifiInfo.getSSID(), wifiInfo.getSSID());
-                            list.clear();
-                            Cursor cursor = mDbOpenHelper.selectColumns();
-                            while (cursor.moveToNext()) {
-                                list.add(new MainListModel(cursor.getString(1), cursor.getString(2),cursor.getString(cursor.getColumnIndex("nickname"))));
-                            }
-                            cursor.close();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mHandler.sendEmptyMessage(1000);
-
-                                }
-                            }).start();
-                        }
-                    });
-                    Nick.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-
-                        }
-                    });
-                    Nick.show();
-                    dialogInterface.dismiss();
-                }
-            });
-            builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            });
-            builder.show();
         }
     }
 
     public void AutoService(){
+        // TODO : 출처 : https://forest71.tistory.com/185
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
         boolean isWhiteListing = false;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -261,12 +153,12 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             startActivity(intent);
         }
 
-        if(MyService.serviceIntent == null){
-            foregroundIntent = new Intent(this, MyService.class);
+        if(BluetoothWifiService.serviceIntent == null){
+            foregroundIntent = new Intent(this, BluetoothWifiService.class);
             startService(foregroundIntent);
             StartToast("service_start");
         }else {
-            foregroundIntent = MyService.serviceIntent;
+            foregroundIntent = BluetoothWifiService.serviceIntent;
             StartToast("service_already");
         }
     }
@@ -303,9 +195,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()){
                     case R.id.edit: // 편집
-                        MainListDialog mainListDialog = new MainListDialog(MainActivity.this);
+                        NickNameDialog mainListDialog = new NickNameDialog(MainActivity.this);
                         mainListDialog.setCancelable(false);
-                        mainListDialog.setDialogListener(new MainListDialog.CustomDialogListener() {
+                        mainListDialog.setDialogListener(new NickNameDialog.CustomDialogListener() {
                             @Override
                             public void PositiveClick(String NickName) {
                                 //TODO : 업데이트문 실행
