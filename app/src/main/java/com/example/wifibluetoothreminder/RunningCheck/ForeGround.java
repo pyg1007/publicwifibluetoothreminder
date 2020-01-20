@@ -8,7 +8,7 @@ public class ForeGround implements Application.ActivityLifecycleCallbacks {
 
     private static ForeGround instance;
 
-    private AppStatus mAppStatus = AppStatus.BACKGROUND;
+    private AppStatus mAppStatus = AppStatus.RETURNED_TO_FOREGROUND;
 
     private int running = 0;
 

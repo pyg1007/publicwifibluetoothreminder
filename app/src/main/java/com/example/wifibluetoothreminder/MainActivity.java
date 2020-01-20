@@ -18,11 +18,13 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -31,13 +33,11 @@ import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
-import com.example.wifibluetoothreminder.RunningCheck.ForeGround;
-import com.example.wifibluetoothreminder.RunningCheck.RunningService;
 import com.example.wifibluetoothreminder.CustomDialog.MainListDialog;
 import com.example.wifibluetoothreminder.RecyclerView.MainListModel;
 import com.example.wifibluetoothreminder.RecyclerView.MainRecyclerViewAdapter;
 import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
-import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
+import com.example.wifibluetoothreminder.Service.MyService;
 
 import java.util.ArrayList;
 
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private ArrayList<MainListModel> list;
     private RecyclerView recyclerView;
     private MainRecyclerViewAdapter mainRecyclerViewAdapter;
+    private Intent foregroundIntent = null;
 
     private Handler mHandler; // MainThread 아닌곳에서 UI 작업할 수 없기 때문에 핸들러 제작
 
@@ -66,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         mDbOpenHelper.open();
         mDbOpenHelper.create();
 
-        Log.e("TAG : ", String.valueOf(ForeGround.get().isBackGround()));
         AutoService();
         UI();
         checkpermmission();
@@ -198,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             //TODO : 리사이클러뷰 추가
+                            StartLog("TAG : ", editText.getText().toString());
                             if(!editText.getText().equals(""))
                                 mDbOpenHelper.insertColumn("WIFI",editText.getText().toString(), wifiInfo.getSSID());
                             else
@@ -238,15 +239,25 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     }
 
     public void AutoService(){
-        RunningService runningService = new RunningService(this);
-        if(!runningService.isRunning("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) { // 중복실행 막기위해서 사용
-            Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);
-            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O) {
-                startForegroundService(intent);
-            }
-            else {
-                startService(intent);
-            }
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
+        boolean isWhiteListing = false;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            isWhiteListing = pm.isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+        }
+        if (!isWhiteListing) {
+            Intent intent = new Intent();
+            intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + getApplicationContext().getPackageName()));
+            startActivity(intent);
+        }
+
+        if(MyService.serviceIntent == null){
+            foregroundIntent = new Intent(this, MyService.class);
+            startService(foregroundIntent);
+            StartToast("service_start");
+        }else {
+            foregroundIntent = MyService.serviceIntent;
+            StartToast("service_already");
         }
     }
 
@@ -261,6 +272,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        if (foregroundIntent != null){
+            stopService(foregroundIntent);
+            foregroundIntent = null;
+        }
     }
 
 

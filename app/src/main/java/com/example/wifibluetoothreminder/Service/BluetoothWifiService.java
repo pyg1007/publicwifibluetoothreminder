@@ -161,7 +161,6 @@ public class BluetoothWifiService extends Service {
     public void onDestroy() {
         //TODO : Service 종료시 할 일
         super.onDestroy();
-        stopForeground(true);
     }
 
     @Override
