@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,6 +41,7 @@ import com.example.wifibluetoothreminder.RecyclerView.MainListModel;
 import com.example.wifibluetoothreminder.RecyclerView.MainRecyclerViewAdapter;
 import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
+import com.example.wifibluetoothreminder.Service.BluetoothService;
 
 import java.util.ArrayList;
 
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private RecyclerView recyclerView;
     private MainRecyclerViewAdapter mainRecyclerViewAdapter;
 
+    private BluetoothService bluetoothService;
     private Handler mHandler; // MainThread 아닌곳에서 UI 작업할 수 없기 때문에 핸들러 제작
 
     private DbOpenHelper mDbOpenHelper;
@@ -69,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         Log.e("TAG : ", String.valueOf(ForeGround.get().isBackGround()));
         AutoService();
         UI();
+
         checkpermmission();
     }
 
@@ -249,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             }
         }
     }
+
 
     public void StartLog(String TAG, String msg){ // 빨간색로그
         Log.e(TAG, msg);
