@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "543265269875",
+    "firebase_url": "https://bluetooth-wifi-reminder.firebaseio.com",
+    "project_id": "bluetooth-wifi-reminder",
+    "storage_bucket": "bluetooth-wifi-reminder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:543265269875:android:33c0dbaae9acbcddf4a206",
+        "android_client_info": {
+          "package_name": "com.example.wifibluetoothreminder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "543265269875-71u852hdftsn7mqpoopu5bg344vuq8ib.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.wifibluetoothreminder",
+            "certificate_hash": "a365295dba8acd333a8f4185a2fae135d748db98"
+          }
+        },
+        {
+          "client_id": "543265269875-m85jrmohutmvhda59umg4sfaqrc3auhk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkDiOiNfsHx3egq4gj93C9sLTnNxvsxf4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "543265269875-m85jrmohutmvhda59umg4sfaqrc3auhk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

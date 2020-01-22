@@ -21,6 +21,7 @@ import android.os.IBinder;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.wifibluetoothreminder.AlarmReceiver;
 import com.example.wifibluetoothreminder.MainActivity;
@@ -35,7 +36,6 @@ public class BluetoothWifiService extends Service {
 
     private ArrayList<String> SSID_list;
     public static Intent serviceIntent = null;
-
 
     public BluetoothWifiService() {
     }
@@ -102,6 +102,7 @@ public class BluetoothWifiService extends Service {
             public void onAvailable(Network network) {
 
                 if (!isExist(info.getSSID()) && isPermission() && ForeGround.get().isBackGround()) {
+                    // TODO : 디비에 존재하지 않고, 퍼미션허용되어있으며, 백그라운드일 때 노티피 알림
                     Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("DetectType", "Wifi");
@@ -121,6 +122,9 @@ public class BluetoothWifiService extends Service {
                         builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText("WIFI가 연결되었습니다. 등록하시겠습니까?").setContentTitle("WIFI 연결감지").setAutoCancel(true);
                         notificationManager.notify(3, builder.build());
                     }
+                }else if(!isExist(info.getSSID()) && isPermission() && !ForeGround.get().isBackGround()){
+                    // TODO : 디비에 존재하지 않고, 퍼미션허용되어있으며, 백그라운드가 아닐 때 등록 다이얼로그
+                    sendMessage("Wifi", info.getSSID());
                 }
             }
 
@@ -132,6 +136,13 @@ public class BluetoothWifiService extends Service {
                 }
             }
         });
+    }
+
+    public void sendMessage(String DeviceType, String SSID){
+        Intent intent = new Intent("Service-Activity");
+        intent.putExtra("DeviceType", DeviceType);
+        intent.putExtra("SSID", SSID);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     @Override

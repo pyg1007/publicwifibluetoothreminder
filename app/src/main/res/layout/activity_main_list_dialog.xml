@@ -19,7 +19,8 @@
         <EditText
             android:id="@+id/NickName"
             android:paddingStart="5dp"
-            android:hint="별명을 지정해주세요"
+            android:hint="별명을 지정하지 않으면 장비이름으로저장됩니다."
+            android:textSize="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </LinearLayout>

@@ -118,19 +118,29 @@ public class DbOpenHelper {
 
     // Update DB
 
-    public boolean updateColumn(long id, String userid, String name){
+    public boolean updateUserTableColumn(String ssid, String nickname){
 
         ContentValues values = new ContentValues();
 
-        values.put(DataBases.CreateDB.SSID, userid);
+        values.put(DataBases.CreateDB.NICKNAME, nickname);
 
-        values.put(DataBases.CreateDB.NICKNAME, name);
+        String[] param = new String[]{ssid};
 
-        return mDB.update(DataBases.CreateDB._TABLENAME0, values, "_id=" + id, null) > 0;
+        return mDB.update(DataBases.CreateDB._TABLENAME0, values, "ssid=?", param) > 0;
 
     }
 
+    public boolean updatePlanTableColumn(String _id, String content){
 
+        ContentValues values = new ContentValues();
+
+        values.put(DataBases.CreateDB2.CONTENT, content);
+
+        String[] param = new String[]{_id};
+
+        return mDB.update(DataBases.CreateDB._TABLENAME0, values, "_id=?", param) > 0;
+
+    }
 
     // Delete All
 
@@ -144,10 +154,14 @@ public class DbOpenHelper {
 
     // Delete DB
 
-    public boolean deleteColumn(long id){
+    public boolean deleteUserTableColumn(String ssid){
+        String[] params = new String[]{ssid};
+        return mDB.delete(DataBases.CreateDB._TABLENAME0, "ssid=?", params)>0;
+    }
 
-        return mDB.delete(DataBases.CreateDB._TABLENAME0, "_id="+id, null) > 0;
-
+    public boolean deletePlanTableCloumn(String ssid, String content){
+        String[] params = new String[]{ssid, content};
+        return mDB.delete(DataBases.CreateDB2._TABLENAME1,"ssid=? and content=?",params)>0;
     }
 
     // Select DB
@@ -162,7 +176,10 @@ public class DbOpenHelper {
         return mDB.query(DataBases.CreateDB2._TABLENAME1, null, null, null, null, null, null);
     }
 
-
+    public Cursor selectSSIDColumns(String ssid){
+        String[] id = new String[]{ssid};
+        return mDB.query(DataBases.CreateDB2._TABLENAME1,null,"SSID=?", id,null,null,null);
+    }
 
 
     // sort by column

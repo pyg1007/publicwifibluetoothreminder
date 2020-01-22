@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,7 +40,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
         public TextView NickName;
         public TextView ContentsCount;
-        public TextView DeviceName;
+        public ImageView DeviceName;
 
         public CoustomViewHolder(View view){
             super(view);
@@ -88,7 +89,10 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public void onBindViewHolder(@NonNull MainRecyclerViewAdapter.CoustomViewHolder holder, int position) {
         holder.NickName.setText(itemList.get(position).getNickName());
         holder.ContentsCount.setText(itemList.get(position).getContentsCount());
-        holder.DeviceName.setText(itemList.get(position).getDevice()); // 여기서이미지?
+        if (itemList.get(position).getDevice().equals("Wifi"))
+            holder.DeviceName.setImageResource(R.drawable.ic_wifi_black_24dp);
+        else if (itemList.get(position).getDevice().equals("Bluetooth"))
+            holder.DeviceName.setImageResource(R.drawable.ic_bluetooth_black_24dp);
     }
 
     @Override
