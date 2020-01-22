@@ -20,21 +20,21 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
     private ContentsModelAdapter.OnListItemClickInterface mClickListener;
     private ContentsModelAdapter.OnListItemLongClickInterface mLongClickListener;
 
-    public ContentsModelAdapter(ArrayList<ContentsModel> item, OnListItemClickInterface onListItemClickInterface, OnListItemLongClickInterface onListItemLongClickInterface){
+    public ContentsModelAdapter(ArrayList<ContentsModel> item, OnListItemClickInterface onListItemClickInterface, OnListItemLongClickInterface onListItemLongClickInterface) {
         this.list = item;
         this.mClickListener = onListItemClickInterface;
         this.mLongClickListener = onListItemLongClickInterface;
     }
 
-    public interface OnListItemLongClickInterface{
+    public interface OnListItemLongClickInterface {
         void onItemLongClick(View v, int position);
     }
 
-    public interface OnListItemClickInterface{
+    public interface OnListItemClickInterface {
         void onItemClick(View v, int position);
     }
 
-    public class CustomViewHoler extends RecyclerView.ViewHolder{
+    public class CustomViewHoler extends RecyclerView.ViewHolder {
 
         public TextView ContentView;
 
@@ -68,21 +68,14 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
         Context context = parent.getContext();
 
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = layoutInflater.inflate(R.layout.contentslistitem,parent,false);
+        View view = layoutInflater.inflate(R.layout.contentslistitem, parent, false);
         CustomViewHoler customViewHoler = new CustomViewHoler(view);
         return customViewHoler;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ContentsModelAdapter.CustomViewHoler holder, int position) {
-        for (int i = 0; i<list.get(position).getContents().length(); i++) {
-//            Log.e("TAG : ", String.valueOf(i));
-//            if (holder.ContentView.getPaint().measureText(list.get(position).getContents().substring(0, i + 1), 0, list.get(position).getContents().length()) >= 320.0f) {
-//                holder.ContentView.setText(list.get(position).getContents().substring(0, i) + "...");
-//                break;
-//            }else
-                holder.ContentView.setText(list.get(position).getContents().substring(0,i+1));
-        }
+        holder.ContentView.setText(list.get(position).getContents());
     }
 
 

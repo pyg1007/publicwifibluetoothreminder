@@ -36,52 +36,12 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
     private FloatingActionButton floatingActionButton;
 
-    public static final String _ID = "_id";
-
-    public static final String DEVICE = "device";
-
-    public static final String ssid = "ssid";
-
-    public static final String NICKNAME = "nickname";
-
-    public static final String _TABLENAME0 = "usertable";
-
-    public static final String _CREATE0 = "create table if not exists "+_TABLENAME0+"("
-
-            +_ID+" integer auto_increment, "
-
-            +DEVICE+" text not null,"
-
-            +ssid+" text not null ,"
-
-            +NICKNAME+ " text not null,"
-
-            + "PRIMARY KEY (" + ssid + "))";
-
-    public static final String CONTENT = "content";
-
-    public static final String _TABLENAME1 = "plantable";
-
-    public static final String _CREATE1 = "create table if not exists " + _TABLENAME1 + "("
-
-            + _ID + " integer auto_increment, "
-
-            + ssid + " text not null, "
-
-            + CONTENT + " text not null ,"
-
-            + "FOREIGN KEY(" + ssid + " ) REFERENCES " // foreign(현재테이블의 키) REFERENCE 가져올테이블 이름 (컬럼이름)
-
-            + _TABLENAME0 + "(ssid))";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contents);
 
         UI();
-        Log.e("Table1 : ", _CREATE0);
-        Log.e("Table2 : ", _CREATE1);
     }
 
     public void UI(){ // UI여기서 작업
