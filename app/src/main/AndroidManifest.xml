@@ -42,7 +42,8 @@
         <service
             android:name=".Service.BluetoothWifiService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:stopWithTask="false"/>
 
         <activity android:name=".CustomDialog.ContentDialog" />
         <activity android:name=".CustomDialog.NickNameDialog" />

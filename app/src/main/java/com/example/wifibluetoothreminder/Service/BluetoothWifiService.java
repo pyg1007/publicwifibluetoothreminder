@@ -18,6 +18,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -101,6 +103,8 @@ public class BluetoothWifiService extends Service {
             @Override
             public void onAvailable(Network network) {
 
+                Toast.makeText(BluetoothWifiService.this, "감지", Toast.LENGTH_SHORT).show();
+
                 if (!isExist(info.getSSID()) && isPermission() && ForeGround.get().isBackGround()) {
                     // TODO : 디비에 존재하지 않고, 퍼미션허용되어있으며, 백그라운드일 때 노티피 알림
                     Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
@@ -124,6 +128,8 @@ public class BluetoothWifiService extends Service {
                     }
                 }else if(!isExist(info.getSSID()) && isPermission() && !ForeGround.get().isBackGround()){
                     // TODO : 디비에 존재하지 않고, 퍼미션허용되어있으며, 백그라운드가 아닐 때 등록 다이얼로그
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(3);
                     sendMessage("Wifi", info.getSSID());
                 }
             }
@@ -183,6 +189,7 @@ public class BluetoothWifiService extends Service {
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
 
+        Log.e("TAG : ", String.valueOf(rootIntent));
         serviceIntent = null;
         setAlarmTimer();
     }

@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                     setFirstDetectDialog(Detect_Type, SSID);
             }else if ("Activity-Activity".equals(intent.getAction())){
                 SelectAllDB();
+                mainRecyclerViewAdapter.notifyDataSetChanged();
             }
         }
     };
