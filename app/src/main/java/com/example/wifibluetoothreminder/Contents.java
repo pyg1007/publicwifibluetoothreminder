@@ -5,24 +5,19 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 
 import com.example.wifibluetoothreminder.CustomDialog.ContentDialog;
-import com.example.wifibluetoothreminder.CustomDialog.NickNameDialog;
-import com.example.wifibluetoothreminder.RecyclerView.ContentsModel;
-import com.example.wifibluetoothreminder.RecyclerView.ContentsModelAdapter;
-import com.example.wifibluetoothreminder.RecyclerView.MainRecyclerViewAdapter;
+import com.example.wifibluetoothreminder.Adapter.ContentsModel;
+import com.example.wifibluetoothreminder.Adapter.ContentsModelAdapter;
 import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.util.ArrayList;
 

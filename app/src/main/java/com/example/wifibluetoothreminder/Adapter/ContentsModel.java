@@ -1,4 +1,4 @@
-package com.example.wifibluetoothreminder.RecyclerView;
+package com.example.wifibluetoothreminder.Adapter;
 
 public class ContentsModel {
 

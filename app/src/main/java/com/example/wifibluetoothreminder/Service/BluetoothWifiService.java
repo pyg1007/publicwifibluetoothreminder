@@ -9,7 +9,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -19,7 +18,6 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -28,23 +26,25 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.example.wifibluetoothreminder.AlarmReceiver;
 import com.example.wifibluetoothreminder.MainActivity;
 import com.example.wifibluetoothreminder.R;
+import com.example.wifibluetoothreminder.Room.ListDatabase;
+import com.example.wifibluetoothreminder.Room.WifiBluetoothList;
+import com.example.wifibluetoothreminder.Room.WifiBluetoothListDao;
 import com.example.wifibluetoothreminder.RunningCheck.ForeGround;
-import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class BluetoothWifiService extends Service {
 
-    private ArrayList<String> SSID_list;
-    public static Intent serviceIntent = null;
-
-    public BluetoothWifiService() {
-    }
+    public boolean RestartCheck;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        serviceIntent = intent;
+
+        RestartCheck = intent.getBooleanExtra("Restart", false);
+
+        Log.e("RestartCheck", String.valueOf(RestartCheck));
 
         WifiStatus();
 
@@ -53,26 +53,21 @@ public class BluetoothWifiService extends Service {
 
     public boolean isExist(String SSID){ // 디비에 SSID가 존재하는지 유무
         boolean check = false;
-
-        SSID_list = new ArrayList<>();
-
-        DbOpenHelper openHelper = new DbOpenHelper(this);
-        openHelper.open();
-        openHelper.create();
-
-        Cursor cursor = openHelper.selectColumns();
-        while(cursor.moveToNext()){
-            SSID_list.add(cursor.getString(2));
+        ListDatabase listDatabase = ListDatabase.getDatabase(getApplication());
+        WifiBluetoothListDao wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
+        List<WifiBluetoothList> list = wifiBluetoothListDao.getAll_Service();
+        List<String> ssid_list = new ArrayList<>();
+        for (int i = 0; i<list.size(); i++){
+            ssid_list.add(list.get(i).getSSID());
         }
-        cursor.close();
-        openHelper.close();
 
-        for(String str : SSID_list){
-            if(str.equals(SSID)) {
+        for(String str : ssid_list){
+            if (SSID.equals(str)) {
                 check = true;
                 break;
             }
         }
+
         return check;
     }
 
@@ -103,9 +98,9 @@ public class BluetoothWifiService extends Service {
             @Override
             public void onAvailable(Network network) {
 
-                Toast.makeText(BluetoothWifiService.this, "감지", Toast.LENGTH_SHORT).show();
+                Log.e("onAvailable : ", "onAvailable");
 
-                if (!isExist(info.getSSID()) && isPermission() && ForeGround.get().isBackGround()) {
+                if (!isExist(info.getSSID()) && isPermission() && (ForeGround.get().isBackGround() || RestartCheck)) {
                     // TODO : 디비에 존재하지 않고, 퍼미션허용되어있으며, 백그라운드일 때 노티피 알림
                     Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -126,7 +121,7 @@ public class BluetoothWifiService extends Service {
                         builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText("WIFI가 연결되었습니다. 등록하시겠습니까?").setContentTitle("WIFI 연결감지").setAutoCancel(true);
                         notificationManager.notify(3, builder.build());
                     }
-                }else if(!isExist(info.getSSID()) && isPermission() && !ForeGround.get().isBackGround()){
+                }else if(!isExist(info.getSSID()) && isPermission() && (!ForeGround.get().isBackGround() || !RestartCheck)){
                     // TODO : 디비에 존재하지 않고, 퍼미션허용되어있으며, 백그라운드가 아닐 때 등록 다이얼로그
                     NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.cancel(3);
@@ -136,7 +131,7 @@ public class BluetoothWifiService extends Service {
 
             @Override
             public void onLost(Network network) {
-                if (!isExist(info.getSSID()) && isPermission() && ForeGround.get().isBackGround()) {
+                if (!isExist(info.getSSID()) && isPermission() && (ForeGround.get().isBackGround() || RestartCheck)) {
                     NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.cancel(3);
                 }
@@ -154,8 +149,6 @@ public class BluetoothWifiService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        serviceIntent = null;
         setAlarmTimer();
     }
 
@@ -189,8 +182,6 @@ public class BluetoothWifiService extends Service {
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
 
-        Log.e("TAG : ", String.valueOf(rootIntent));
-        serviceIntent = null;
         setAlarmTimer();
     }
 }

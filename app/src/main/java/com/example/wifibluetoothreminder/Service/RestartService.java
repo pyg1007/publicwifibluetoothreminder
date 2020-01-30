@@ -8,20 +8,26 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.wifibluetoothreminder.MainActivity;
 import com.example.wifibluetoothreminder.R;
+import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
 
 public class RestartService extends Service {
+
+    ServiceRunningCheck serviceRunningCheck;
+
     public RestartService() {
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        serviceRunningCheck = new ServiceRunningCheck(this);
     }
 
     @Override
@@ -48,8 +54,12 @@ public class RestartService extends Service {
         startForeground(9, notification);
 
         /////////////////////////////////////////////////////////////////////
-        Intent in = new Intent(this, BluetoothWifiService.class);
-        startService(in);
+        if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) {
+            Intent in = new Intent(this, BluetoothWifiService.class);
+            in.putExtra("Restart", true);
+            startService(in);
+            Log.e("RestartService:", "A");
+        }
 
         stopForeground(true);
         stopSelf();

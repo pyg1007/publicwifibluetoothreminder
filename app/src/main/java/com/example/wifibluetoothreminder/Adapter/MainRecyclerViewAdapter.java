@@ -1,4 +1,4 @@
-package com.example.wifibluetoothreminder.RecyclerView;
+package com.example.wifibluetoothreminder.Adapter;
 
 import android.content.Context;
 import android.util.Log;
@@ -12,16 +12,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wifibluetoothreminder.R;
+import com.example.wifibluetoothreminder.Room.WifiBluetoothList;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.CoustomViewHolder> {
 
-    private ArrayList<MainListModel> itemList;
+    private List<WifiBluetoothList> itemList;
     private OnListItemClickInterface mClickListener;
     private OnListItemLongClickInterface mLongClickListener;
 
-    public MainRecyclerViewAdapter(ArrayList<MainListModel> item, OnListItemLongClickInterface LongClickListener, OnListItemClickInterface ClickListener){
+    public MainRecyclerViewAdapter(List<WifiBluetoothList> item, OnListItemLongClickInterface LongClickListener, OnListItemClickInterface ClickListener){
         this.itemList = item;
         this.mClickListener = ClickListener;
         this.mLongClickListener = LongClickListener;
@@ -87,11 +88,12 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull MainRecyclerViewAdapter.CoustomViewHolder holder, int position) {
+        Log.e("TAG : " , itemList.get(position).getSSID());
         holder.NickName.setText(itemList.get(position).getNickName());
-        holder.ContentsCount.setText(itemList.get(position).getContentsCount());
-        if (itemList.get(position).getDevice().equals("Wifi"))
+        holder.ContentsCount.setText(String.valueOf(itemList.get(position).getCount()));
+        if (itemList.get(position).getDevice_Type().equals("Wifi"))
             holder.DeviceName.setImageResource(R.drawable.ic_wifi_black_24dp);
-        else if (itemList.get(position).getDevice().equals("Bluetooth"))
+        else if (itemList.get(position).getDevice_Type().equals("Bluetooth"))
             holder.DeviceName.setImageResource(R.drawable.ic_bluetooth_black_24dp);
     }
 

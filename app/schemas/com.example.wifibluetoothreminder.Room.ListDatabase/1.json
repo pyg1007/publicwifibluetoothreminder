@@ -1,0 +1,52 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "9bcd583164c67a4640a3aad63233d482",
+    "entities": [
+      {
+        "tableName": "wb_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Device_Type` TEXT NOT NULL, `SSID` TEXT NOT NULL, `NickName` TEXT NOT NULL, `Count` INTEGER NOT NULL, PRIMARY KEY(`SSID`))",
+        "fields": [
+          {
+            "fieldPath": "Device_Type",
+            "columnName": "Device_Type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "SSID",
+            "columnName": "SSID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "NickName",
+            "columnName": "NickName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Count",
+            "columnName": "Count",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "SSID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9bcd583164c67a4640a3aad63233d482')"
+    ]
+  }
+}
