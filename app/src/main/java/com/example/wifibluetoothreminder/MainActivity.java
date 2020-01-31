@@ -33,6 +33,7 @@ import com.example.wifibluetoothreminder.CustomDialog.NickNameDialog;
 import com.example.wifibluetoothreminder.Adapter.MainRecyclerViewAdapter;
 import com.example.wifibluetoothreminder.Room.WifiBluetoothList;
 import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
+import com.example.wifibluetoothreminder.Service.BluetoothService;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.ViewModel.WifiBluetoothListViewModel;
 
@@ -209,6 +210,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")){
             startService(new Intent(MainActivity.this, BluetoothWifiService.class));
             StartLog("MainActivity : ", "A");
+        }else{
+            stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
+            startService(new Intent(MainActivity.this, BluetoothWifiService.class));
         }
 
 

@@ -27,6 +27,7 @@ public class WifiBluetoothList {
         this.Count = Count;
     }
 
+    @NonNull
     public int getCount() {
         return Count;
     }

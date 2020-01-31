@@ -16,7 +16,6 @@ import android.widget.PopupMenu;
 import com.example.wifibluetoothreminder.CustomDialog.ContentDialog;
 import com.example.wifibluetoothreminder.Adapter.ContentsModel;
 import com.example.wifibluetoothreminder.Adapter.ContentsModelAdapter;
-import com.example.wifibluetoothreminder.SQLite.DbOpenHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     ArrayList<ContentsModel> item;
     private RecyclerView recyclerView;
     private ContentsModelAdapter contentsModelAdapter;
-    private DbOpenHelper mDbOpenHelper;
 
     private FloatingActionButton floatingActionButton;
 
@@ -44,7 +42,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
         item = new ArrayList<>();
 
-        Select_SSID_Contents();
         recyclerView = findViewById(R.id.ContentList);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -57,42 +54,42 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         floatingActionButton.setOnClickListener(this);
     }
 
-    public void Select_SSID_Contents(){
-        mDbOpenHelper = new DbOpenHelper(this);
-        mDbOpenHelper.open();
-        mDbOpenHelper.create();
-        item.clear();
-        Cursor cursor = mDbOpenHelper.selectColumns2();
-        while(cursor.moveToNext()){
-            item.add(new ContentsModel(cursor.getString(0),cursor.getString(1), cursor.getString(2))); //임시지정
-        }
-        cursor.close();
-        mDbOpenHelper.close();
-    }
-
-    public void InsertContent(String ssid, String content){
-        mDbOpenHelper = new DbOpenHelper(this);
-        mDbOpenHelper.open();
-        mDbOpenHelper.create();
-        mDbOpenHelper.insertColumn2(ssid, content);
-        mDbOpenHelper.close();
-    }
-
-    public void DeleteContent(String ssid, String content){
-        mDbOpenHelper = new DbOpenHelper(this);
-        mDbOpenHelper.open();
-        mDbOpenHelper.create();
-        mDbOpenHelper.deletePlanTableCloumn(ssid, content);
-        mDbOpenHelper.close();
-    }
-
-    public void UpdateContent(String _id, String content){
-        mDbOpenHelper = new DbOpenHelper(this);
-        mDbOpenHelper.open();
-        mDbOpenHelper.create();
-        mDbOpenHelper.updatePlanTableColumn(_id, content);
-        mDbOpenHelper.close();
-    }
+//    public void Select_SSID_Contents(){
+//        mDbOpenHelper = new DbOpenHelper(this);
+//        mDbOpenHelper.open();
+//        mDbOpenHelper.create();
+//        item.clear();
+//        Cursor cursor = mDbOpenHelper.selectColumns2();
+//        while(cursor.moveToNext()){
+//            item.add(new ContentsModel(cursor.getString(0),cursor.getString(1), cursor.getString(2))); //임시지정
+//        }
+//        cursor.close();
+//        mDbOpenHelper.close();
+//    }
+//
+//    public void InsertContent(String ssid, String content){
+//        mDbOpenHelper = new DbOpenHelper(this);
+//        mDbOpenHelper.open();
+//        mDbOpenHelper.create();
+//        mDbOpenHelper.insertColumn2(ssid, content);
+//        mDbOpenHelper.close();
+//    }
+//
+//    public void DeleteContent(String ssid, String content){
+//        mDbOpenHelper = new DbOpenHelper(this);
+//        mDbOpenHelper.open();
+//        mDbOpenHelper.create();
+//        mDbOpenHelper.deletePlanTableCloumn(ssid, content);
+//        mDbOpenHelper.close();
+//    }
+//
+//    public void UpdateContent(String _id, String content){
+//        mDbOpenHelper = new DbOpenHelper(this);
+//        mDbOpenHelper.open();
+//        mDbOpenHelper.create();
+//        mDbOpenHelper.updatePlanTableColumn(_id, content);
+//        mDbOpenHelper.close();
+//    }
 
     public void getData(){
         Intent intent = getIntent();
@@ -120,8 +117,8 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
                             @Override
                             public void PositiveClick(String Contents) {
-                                UpdateContent(item.get(position).get_ID(), Contents);
-                                Select_SSID_Contents();
+//                                UpdateContent(item.get(position).get_ID(), Contents);
+//                                Select_SSID_Contents();
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
 
@@ -134,8 +131,8 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         break;
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
-                        DeleteContent(item.get(position).getSSID(), item.get(position).getContents());
-                        Select_SSID_Contents();
+//                        DeleteContent(item.get(position).getSSID(), item.get(position).getContents());
+//                        Select_SSID_Contents();
                         contentsModelAdapter.notifyDataSetChanged();
                         break;
                 }
@@ -159,8 +156,8 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
                     @Override
                     public void PositiveClick(String Contents) {
-                        InsertContent(SSID, Contents);
-                        Select_SSID_Contents();
+//                        InsertContent(SSID, Contents);
+//                        Select_SSID_Contents();
                         contentsModelAdapter.notifyDataSetChanged();
 
                     }
