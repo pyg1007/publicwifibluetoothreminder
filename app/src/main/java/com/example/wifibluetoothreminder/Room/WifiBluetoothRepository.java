@@ -26,6 +26,7 @@ public class WifiBluetoothRepository {
         return Wifibluetoothlist;
     }
 
+
     public void insert(final WifiBluetoothList wifiBluetoothList){
         Runnable addRunnable = new Runnable() {
             @Override
@@ -42,6 +43,17 @@ public class WifiBluetoothRepository {
             @Override
             public void run() {
                 wifiBluetoothListDao.update(SSID, NickName);
+            }
+        };
+        Executor Update = Executors.newSingleThreadExecutor();
+        Update.execute(updateRunnable);
+    }
+
+    public void updatecount(final String SSID, final int Count){
+        Runnable updateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                wifiBluetoothListDao.updateCount(SSID, Count);
             }
         };
         Executor Update = Executors.newSingleThreadExecutor();

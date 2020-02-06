@@ -10,16 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wifibluetoothreminder.R;
+import com.example.wifibluetoothreminder.Room.ContentList;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdapter.CustomViewHoler> {
 
-    ArrayList<ContentsModel> list;
+    private List<ContentList> list;
     private ContentsModelAdapter.OnListItemClickInterface mClickListener;
     private ContentsModelAdapter.OnListItemLongClickInterface mLongClickListener;
 
-    public ContentsModelAdapter(ArrayList<ContentsModel> item, OnListItemClickInterface onListItemClickInterface, OnListItemLongClickInterface onListItemLongClickInterface) {
+    public ContentsModelAdapter(List<ContentList> item, OnListItemClickInterface onListItemClickInterface, OnListItemLongClickInterface onListItemLongClickInterface) {
         this.list = item;
         this.mClickListener = onListItemClickInterface;
         this.mLongClickListener = onListItemLongClickInterface;
@@ -74,7 +75,7 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
 
     @Override
     public void onBindViewHolder(@NonNull ContentsModelAdapter.CustomViewHoler holder, int position) {
-        holder.ContentView.setText(list.get(position).getContents());
+        holder.ContentView.setText(list.get(position).getContent());
     }
 
 

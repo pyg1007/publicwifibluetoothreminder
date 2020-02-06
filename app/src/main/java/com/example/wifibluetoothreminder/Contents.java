@@ -1,31 +1,37 @@
 package com.example.wifibluetoothreminder;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 
 import com.example.wifibluetoothreminder.CustomDialog.ContentDialog;
-import com.example.wifibluetoothreminder.Adapter.ContentsModel;
 import com.example.wifibluetoothreminder.Adapter.ContentsModelAdapter;
+import com.example.wifibluetoothreminder.Room.ContentList;
+import com.example.wifibluetoothreminder.ViewModel.ContentListViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Contents extends AppCompatActivity implements ContentsModelAdapter.OnListItemClickInterface, ContentsModelAdapter.OnListItemLongClickInterface, View.OnClickListener{
 
     private String SSID;
-    ArrayList<ContentsModel> item;
+    private List<ContentList> item;
     private RecyclerView recyclerView;
     private ContentsModelAdapter contentsModelAdapter;
+
+    private ContentListViewModel contentListViewModel;
 
     private FloatingActionButton floatingActionButton;
 
@@ -35,6 +41,22 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         setContentView(R.layout.activity_contents);
 
         UI();
+
+        contentListViewModel = new ViewModelProvider(this).get(ContentListViewModel.class);
+        contentListViewModel.getAll().observe(this, new Observer<List<ContentList>>() {
+            @Override
+            public void onChanged(List<ContentList> contentLists) {
+                item.clear();
+                if (contentLists.size() != 0){
+                    for(ContentList contentList : contentLists)
+                        item.add(contentList);
+                }
+                for (int i = 0; i<item.size(); i++) {
+                    Log.e("TAG :", String.valueOf(item.get(i).ID) + " : " + item.get(i).Content + " : " + item.get(i).Content_SSID);
+                }
+                contentsModelAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void UI(){ // UI여기서 작업
@@ -54,43 +76,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         floatingActionButton.setOnClickListener(this);
     }
 
-//    public void Select_SSID_Contents(){
-//        mDbOpenHelper = new DbOpenHelper(this);
-//        mDbOpenHelper.open();
-//        mDbOpenHelper.create();
-//        item.clear();
-//        Cursor cursor = mDbOpenHelper.selectColumns2();
-//        while(cursor.moveToNext()){
-//            item.add(new ContentsModel(cursor.getString(0),cursor.getString(1), cursor.getString(2))); //임시지정
-//        }
-//        cursor.close();
-//        mDbOpenHelper.close();
-//    }
-//
-//    public void InsertContent(String ssid, String content){
-//        mDbOpenHelper = new DbOpenHelper(this);
-//        mDbOpenHelper.open();
-//        mDbOpenHelper.create();
-//        mDbOpenHelper.insertColumn2(ssid, content);
-//        mDbOpenHelper.close();
-//    }
-//
-//    public void DeleteContent(String ssid, String content){
-//        mDbOpenHelper = new DbOpenHelper(this);
-//        mDbOpenHelper.open();
-//        mDbOpenHelper.create();
-//        mDbOpenHelper.deletePlanTableCloumn(ssid, content);
-//        mDbOpenHelper.close();
-//    }
-//
-//    public void UpdateContent(String _id, String content){
-//        mDbOpenHelper = new DbOpenHelper(this);
-//        mDbOpenHelper.open();
-//        mDbOpenHelper.create();
-//        mDbOpenHelper.updatePlanTableColumn(_id, content);
-//        mDbOpenHelper.close();
-//    }
-
     public void getData(){
         Intent intent = getIntent();
         SSID = intent.getStringExtra("SSID");
@@ -98,8 +83,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent("Activity-Activity");
-        LocalBroadcastManager.getInstance(Contents.this).sendBroadcast(intent);
         super.onBackPressed();
     }
 
@@ -117,8 +100,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
                             @Override
                             public void PositiveClick(String Contents) {
-//                                UpdateContent(item.get(position).get_ID(), Contents);
-//                                Select_SSID_Contents();
+                                contentListViewModel.Update(item.get(position).ID, Contents);
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
 
@@ -131,8 +113,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         break;
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
-//                        DeleteContent(item.get(position).getSSID(), item.get(position).getContents());
-//                        Select_SSID_Contents();
+                        contentListViewModel.Delete(item.get(position).ID, item.get(position).getContent());
                         contentsModelAdapter.notifyDataSetChanged();
                         break;
                 }
@@ -156,8 +137,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
                     @Override
                     public void PositiveClick(String Contents) {
-//                        InsertContent(SSID, Contents);
-//                        Select_SSID_Contents();
+                        contentListViewModel.Insert(new ContentList(SSID, Contents));
                         contentsModelAdapter.notifyDataSetChanged();
 
                     }

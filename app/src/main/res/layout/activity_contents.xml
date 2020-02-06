@@ -18,6 +18,6 @@
         android:layout_height = "wrap_content"
         app:fabSize = "normal"
         android:src = "@drawable/ic_add_black_24dp"
-        android:gravity = "right|bottom"
+        android:layout_gravity= "bottom|end"
     />
 </LinearLayout>

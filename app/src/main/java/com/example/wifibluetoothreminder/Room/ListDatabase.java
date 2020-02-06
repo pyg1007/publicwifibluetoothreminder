@@ -6,7 +6,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {WifiBluetoothList.class, ContentList.class}, version = 1)
+@Database(entities = {WifiBluetoothList.class, ContentList.class}, version = 2)
 public abstract class ListDatabase extends RoomDatabase {
 
     public abstract WifiBluetoothListDao wifiBluetoothListDao();

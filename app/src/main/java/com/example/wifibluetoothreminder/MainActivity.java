@@ -1,6 +1,7 @@
 package com.example.wifibluetoothreminder;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,6 +23,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,12 +35,17 @@ import android.widget.Toast;
 
 import com.example.wifibluetoothreminder.CustomDialog.NickNameDialog;
 import com.example.wifibluetoothreminder.Adapter.MainRecyclerViewAdapter;
+import com.example.wifibluetoothreminder.Room.ContentList;
+import com.example.wifibluetoothreminder.Room.ContentListDao;
+import com.example.wifibluetoothreminder.Room.ListDatabase;
 import com.example.wifibluetoothreminder.Room.WifiBluetoothList;
+import com.example.wifibluetoothreminder.Room.WifiBluetoothListDao;
 import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
-import com.example.wifibluetoothreminder.Service.BluetoothService;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
+import com.example.wifibluetoothreminder.ViewModel.ContentListViewModel;
 import com.example.wifibluetoothreminder.ViewModel.WifiBluetoothListViewModel;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,9 +54,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     // 변경되지 않을 상수
     private static final int REQUEST_ACCESS_LOCATION = 1000;
 
-    private List<WifiBluetoothList> list;
-    private RecyclerView recyclerView;
-    private MainRecyclerViewAdapter mainRecyclerViewAdapter;
+    public List<WifiBluetoothList> list;
+    public RecyclerView recyclerView;
+    public MainRecyclerViewAdapter mainRecyclerViewAdapter;
 
     private WifiBluetoothListViewModel wifiBluetoothListViewModel;
 
@@ -58,44 +67,56 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        checkpermmission();
         UI();
-        AutoService();
-        notiDataCheck();
+        checkpermmission();
 
-        wifiBluetoothListViewModel = new ViewModelProvider(this).get(WifiBluetoothListViewModel.class);;
+        wifiBluetoothListViewModel = new ViewModelProvider(this).get(WifiBluetoothListViewModel.class);
         wifiBluetoothListViewModel.getAllData().observe(this, new Observer<List<WifiBluetoothList>>() {
             @Override
             public void onChanged(List<WifiBluetoothList> wifiBluetoothLists) {
                 list.clear();
                 if (wifiBluetoothLists.size() != 0){
-                    for(int i = 0; i<wifiBluetoothLists.size(); i++)
-                        list.add(new WifiBluetoothList(wifiBluetoothLists.get(i).getDevice_Type(), wifiBluetoothLists.get(i).getSSID(), wifiBluetoothLists.get(i).getNickName(), wifiBluetoothLists.get(i).getCount()));
+                    for(WifiBluetoothList wifiBluetoothList : wifiBluetoothLists)
+                        list.add(wifiBluetoothList);
                 }
                 mainRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
-
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-       LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        StartLog("onResume", "onResume");
+        Runnable update = new Runnable() {
+            @Override
+            public void run() {
+                NonLeakHandler nonLeakHandler = new NonLeakHandler(MainActivity.this, mainRecyclerViewAdapter);
+                ListDatabase listDatabase = ListDatabase.getDatabase(MainActivity.this);
+                ContentListDao dao = listDatabase.contentListDao();
+                WifiBluetoothListDao wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
+                List<WifiBluetoothList> lists = wifiBluetoothListDao.getAll_Service(); // Content에서 뒤로가기 시에는 list에 값이 존재하지만, 최초실행시는 존재하지 않기 때문에 값을 가져옴.
+                for (int i = 0; i<lists.size(); i++) {
+                    List<ContentList> item = dao.getItem(lists.get(i).getSSID());
+                    wifiBluetoothListViewModel.updateCount(lists.get(i).getSSID(), item.size());
+                }
+                nonLeakHandler.sendEmptyMessage(100);
+            }
+        };
+        Thread thread = new Thread(update);
+        thread.start();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("Service-Activity"));
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.e("Receive : ", "Active");
-            StartLog("ServiceCount : ", String.valueOf(serviceRunningCheck.RunningCount()));
             if ("Service-Activity".equals(intent.getAction())) {
                 String Detect_Type = intent.getStringExtra("DeviceType");
                 String SSID = intent.getStringExtra("SSID");
@@ -119,18 +140,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         mainRecyclerViewAdapter = new MainRecyclerViewAdapter(list, MainActivity.this, MainActivity.this);
         recyclerView.setAdapter(mainRecyclerViewAdapter);
 
-    }
-
-    public void notiDataCheck() { // 노티로 접근시 작동
-        Bundle extra = getIntent().getExtras();
-
-        if (extra != null) {
-            StartLog("A", "ACTION");
-            String Detect_Type = extra.getString("DetectType");
-            String SSID = extra.getString("SSID");
-            if (Detect_Type != null && SSID != null)
-                setFirstDetectDialog(Detect_Type, SSID);
-        }
     }
 
     public void setFirstDetectDialog(final String Detect_Type, final String ssid) {
@@ -164,6 +173,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
             if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED || ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED)
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_LOCATION);
+            else if(ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED)
+                AutoService();
         }
     }
 
@@ -265,6 +276,16 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
                         wifiBluetoothListViewModel.delete(list.get(position).getSSID());
+                        Runnable del = new Runnable() {
+                            @Override
+                            public void run() {
+                                ListDatabase listDatabase = ListDatabase.getDatabase(MainActivity.this);
+                                ContentListDao contentDao = listDatabase.contentListDao();
+                                contentDao.Delete_All(list.get(position).getSSID());
+                            }
+                        };
+                        Thread thread = new Thread(del);
+                        thread.start();
                         mainRecyclerViewAdapter.notifyDataSetChanged();
                         break;
                 }
@@ -276,9 +297,30 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
     @Override
     public void onItemClick(View v, int position) {
-        MainRecyclerViewAdapter.CoustomViewHolder viewHolder = (MainRecyclerViewAdapter.CoustomViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
         Intent intent = new Intent(MainActivity.this, Contents.class);
         intent.putExtra("SSID", list.get(position).getSSID());
         startActivity(intent);
+    }
+
+    private static final class NonLeakHandler extends Handler{
+
+        private final WeakReference<MainActivity> ref;
+        private MainRecyclerViewAdapter mainRecyclerViewAdapter;
+
+        public NonLeakHandler(MainActivity act, MainRecyclerViewAdapter adapter){
+            ref = new WeakReference<>(act);
+            mainRecyclerViewAdapter = adapter;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            MainActivity act = ref.get();
+            if (act != null){
+                switch (msg.what){
+                    case 100:
+                        mainRecyclerViewAdapter.notifyDataSetChanged();
+                }
+            }
+        }
     }
 }

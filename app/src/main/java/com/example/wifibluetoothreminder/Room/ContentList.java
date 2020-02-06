@@ -9,7 +9,7 @@ public class ContentList {
 
     @NonNull
     @PrimaryKey(autoGenerate = true)
-    public int ID;
+    public Integer ID;
 
     @NonNull
     public String Content_SSID;
@@ -17,9 +17,19 @@ public class ContentList {
     @NonNull
     public String Content;
 
-    public ContentList(int ID, @NonNull String Content_SSID, @NonNull String Content){
-        this.ID = ID;
+    public ContentList(@NonNull String Content_SSID, @NonNull String Content){
         this.Content_SSID = Content_SSID;
         this.Content = Content;
+    }
+
+
+    @NonNull
+    public String getContent_SSID() {
+        return Content_SSID;
+    }
+
+    @NonNull
+    public String getContent() {
+        return Content;
     }
 }

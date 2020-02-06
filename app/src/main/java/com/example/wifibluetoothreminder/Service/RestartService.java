@@ -58,7 +58,6 @@ public class RestartService extends Service {
             Intent in = new Intent(this, BluetoothWifiService.class);
             in.putExtra("Restart", true);
             startService(in);
-            Log.e("RestartService:", "A");
         }
 
         stopForeground(true);

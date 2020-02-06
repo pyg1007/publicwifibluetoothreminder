@@ -34,6 +34,10 @@ public class WifiBluetoothListViewModel extends AndroidViewModel {
         wifiBluetoothRepository.update(SSID, NickName);
     }
 
+    public void updateCount(String SSID, int count){
+        wifiBluetoothRepository.updatecount(SSID, count);
+    }
+
     public void delete(String SSID){
         wifiBluetoothRepository.delete(SSID);
     }

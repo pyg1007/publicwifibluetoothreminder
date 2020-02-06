@@ -2,7 +2,9 @@ package com.example.wifibluetoothreminder.Room;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Ignore;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import java.util.List;
@@ -13,6 +15,9 @@ public interface ContentListDao {
     @Query("SELECT * FROM Content_table")
     LiveData<List<ContentList>> getAll();
 
+    @Query("SELECT * FROM Content_table WHERE Content_SSID = :Content_SSID")
+    List<ContentList> getItem(String Content_SSID);
+
     @Insert
     void Insert(ContentList contentList);
 
@@ -21,5 +26,8 @@ public interface ContentListDao {
 
     @Query("Delete FROM Content_table WHERE ID = :ID AND Content = :Content")
     void Delete(int ID, String Content);
+
+    @Query("Delete FROM Content_table Where Content_SSID = :Content_SSID")
+    void Delete_All(String Content_SSID);
 
 }
