@@ -83,6 +83,10 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
     @Override
     public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra("SSID", SSID);
+        intent.putExtra("SIZE", item.size());
+        setResult(200);
         super.onBackPressed();
     }
 

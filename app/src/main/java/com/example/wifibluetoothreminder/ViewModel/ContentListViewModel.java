@@ -37,4 +37,6 @@ public class ContentListViewModel extends AndroidViewModel {
     public void Delete(int ID, String Content){
         contentListRepository.Delete(ID, Content);
     }
+
+    public void DeleteAll(String Content_SSID){contentListRepository.DeleteAll(Content_SSID);}
 }

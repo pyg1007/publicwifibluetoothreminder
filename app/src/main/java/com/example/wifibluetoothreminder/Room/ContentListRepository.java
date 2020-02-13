@@ -58,4 +58,15 @@ public class ContentListRepository {
         Executor executor = Executors.newSingleThreadScheduledExecutor();
         executor.execute(delete);
     }
+
+    public void DeleteAll(final String Content_SSID) {
+        Runnable delete = new Runnable() {
+            @Override
+            public void run() {
+                contentListDao.Delete_All(Content_SSID);
+            }
+        };
+        Executor executor = Executors.newSingleThreadScheduledExecutor();
+        executor.execute(delete);
+    }
 }

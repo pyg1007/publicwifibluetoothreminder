@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public MainRecyclerViewAdapter mainRecyclerViewAdapter;
 
     private WifiBluetoothListViewModel wifiBluetoothListViewModel;
+    private ContentListViewModel contentListViewModel;
 
     ServiceRunningCheck serviceRunningCheck;
 
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         checkpermmission();
 
         wifiBluetoothListViewModel = new ViewModelProvider(this).get(WifiBluetoothListViewModel.class);
+        contentListViewModel = new ViewModelProvider(this).get(ContentListViewModel.class);
         wifiBluetoothListViewModel.getAllData().observe(this, new Observer<List<WifiBluetoothList>>() {
             @Override
             public void onChanged(List<WifiBluetoothList> wifiBluetoothLists) {
@@ -93,24 +95,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     @Override
     protected void onResume() {
         super.onResume();
-        StartLog("onResume", "onResume");
-        Runnable update = new Runnable() {
-            @Override
-            public void run() {
-                NonLeakHandler nonLeakHandler = new NonLeakHandler(MainActivity.this, mainRecyclerViewAdapter);
-                ListDatabase listDatabase = ListDatabase.getDatabase(MainActivity.this);
-                ContentListDao dao = listDatabase.contentListDao();
-                WifiBluetoothListDao wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
-                List<WifiBluetoothList> lists = wifiBluetoothListDao.getAll_Service(); // Content에서 뒤로가기 시에는 list에 값이 존재하지만, 최초실행시는 존재하지 않기 때문에 값을 가져옴.
-                for (int i = 0; i<lists.size(); i++) {
-                    List<ContentList> item = dao.getItem(lists.get(i).getSSID());
-                    wifiBluetoothListViewModel.updateCount(lists.get(i).getSSID(), item.size());
-                }
-                nonLeakHandler.sendEmptyMessage(100);
-            }
-        };
-        Thread thread = new Thread(update);
-        thread.start();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("Service-Activity"));
     }
 
@@ -140,6 +124,26 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         mainRecyclerViewAdapter = new MainRecyclerViewAdapter(list, MainActivity.this, MainActivity.this);
         recyclerView.setAdapter(mainRecyclerViewAdapter);
 
+        RecyclerViewlist_init();
+    }
+
+    public void RecyclerViewlist_init(){
+        Runnable update = new Runnable() {
+            @Override
+            public void run() {
+                ListDatabase listDatabase = ListDatabase.getDatabase(MainActivity.this);
+                ContentListDao dao = listDatabase.contentListDao();
+                WifiBluetoothListDao wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
+                List<WifiBluetoothList> lists = wifiBluetoothListDao.getAll_Service(); // Content에서 뒤로가기 시에는 list에 값이 존재하지만, 최초실행시는 존재하지 않기 때문에 값을 가져옴.
+                for (int i = 0; i<lists.size(); i++) {
+                    List<ContentList> item = dao.getItem(lists.get(i).getSSID());
+                    wifiBluetoothListViewModel.updateCount(lists.get(i).getSSID(), item.size());
+                }
+                handler.sendEmptyMessage(100);
+            }
+        };
+        Thread thread = new Thread(update);
+        thread.start();
     }
 
     public void setFirstDetectDialog(final String Detect_Type, final String ssid) {
@@ -220,7 +224,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
         if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")){
             startService(new Intent(MainActivity.this, BluetoothWifiService.class));
-            StartLog("MainActivity : ", "A");
         }else{
             stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
             startService(new Intent(MainActivity.this, BluetoothWifiService.class));
@@ -276,16 +279,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
                         wifiBluetoothListViewModel.delete(list.get(position).getSSID());
-                        Runnable del = new Runnable() {
-                            @Override
-                            public void run() {
-                                ListDatabase listDatabase = ListDatabase.getDatabase(MainActivity.this);
-                                ContentListDao contentDao = listDatabase.contentListDao();
-                                contentDao.Delete_All(list.get(position).getSSID());
-                            }
-                        };
-                        Thread thread = new Thread(del);
-                        thread.start();
+                        contentListViewModel.DeleteAll(list.get(position).getSSID());
                         mainRecyclerViewAdapter.notifyDataSetChanged();
                         break;
                 }
@@ -299,28 +293,29 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public void onItemClick(View v, int position) {
         Intent intent = new Intent(MainActivity.this, Contents.class);
         intent.putExtra("SSID", list.get(position).getSSID());
-        startActivity(intent);
+        startActivityForResult(intent,100);
     }
 
-    private static final class NonLeakHandler extends Handler{
-
-        private final WeakReference<MainActivity> ref;
-        private MainRecyclerViewAdapter mainRecyclerViewAdapter;
-
-        public NonLeakHandler(MainActivity act, MainRecyclerViewAdapter adapter){
-            ref = new WeakReference<>(act);
-            mainRecyclerViewAdapter = adapter;
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            MainActivity act = ref.get();
-            if (act != null){
-                switch (msg.what){
-                    case 100:
-                        mainRecyclerViewAdapter.notifyDataSetChanged();
-                }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100) {
+            if (resultCode == 200){
+                wifiBluetoothListViewModel.updateCount(data.getStringExtra("SSID"), data.getIntExtra("SIZE",0));
+                mainRecyclerViewAdapter.notifyDataSetChanged();
             }
         }
     }
+
+    @SuppressLint("HandlerLeak")
+    Handler handler =new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 100:
+                    mainRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        }
+    };
+
 }
