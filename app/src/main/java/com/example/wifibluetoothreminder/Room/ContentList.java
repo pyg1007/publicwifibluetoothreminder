@@ -12,16 +12,25 @@ public class ContentList {
     public Integer ID;
 
     @NonNull
+    public String Mac;
+
+    @NonNull
     public String Content_SSID;
 
     @NonNull
     public String Content;
 
-    public ContentList(@NonNull String Content_SSID, @NonNull String Content){
+    public ContentList(@NonNull String Mac, @NonNull String Content_SSID, @NonNull String Content){
+        this.Mac = Mac;
         this.Content_SSID = Content_SSID;
         this.Content = Content;
     }
 
+
+    @NonNull
+    public String getMac() {
+        return Mac;
+    }
 
     @NonNull
     public String getContent_SSID() {

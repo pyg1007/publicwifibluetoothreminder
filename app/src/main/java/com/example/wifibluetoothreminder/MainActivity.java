@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -67,9 +68,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
     private WifiBluetoothListViewModel wifiBluetoothListViewModel;
     private ContentListViewModel contentListViewModel;
-    View dialogView;
-    ServiceRunningCheck serviceRunningCheck;
-    String Selected = "";
+    private View dialogView;
+    private ServiceRunningCheck serviceRunningCheck;
+    private String Selected = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,31 +100,13 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     @Override
     protected void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter("Service-Activity"));
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            BluetoothService bluetoothService = new BluetoothService();
-
-            if ("Service-Activity".equals(intent.getAction())) {
-                String Detect_Type = intent.getStringExtra("DeviceType");
-                String SSID = intent.getStringExtra("SSID");
-                if (Detect_Type != null && SSID != null)
-                    setFirstDetectDialog(Detect_Type, SSID);
-            }
-            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())) {
-                bluetoothService.getLocalBluetoothName();
-            }
-        }
-    };
 
     public void UI() { //UI들 여기 작성
 
@@ -149,11 +132,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 WifiBluetoothListDao wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
                 List<WifiBluetoothList> lists = wifiBluetoothListDao.getAll_Service(); // Content에서 뒤로가기 시에는 list에 값이 존재하지만, 최초실행시는 존재하지 않기 때문에 값을 가져옴.
                 for (int i = 0; i < lists.size(); i++) {
-                    List<ContentList> item = dao.getItem(lists.get(i).getSSID());
+                    List<ContentList> item = dao.getItem(lists.get(i).getMac());
                     StartLog("SSID :" , lists.get(i).getSSID());
                     StartLog("Size :" , String.valueOf(item.size()));
                     if (item.size() != 0)
-                        wifiBluetoothListViewModel.updateCount(lists.get(i).getSSID(), item.size());
+                        wifiBluetoothListViewModel.updateCount(lists.get(i).getMac(), item.size());
                 }
                 handler.sendEmptyMessage(100);
             }
@@ -162,17 +145,17 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         thread.start();
     }
 
-    public void setFirstDetectDialog(final String Detect_Type, final String ssid) {
+    public void setFirstDetectDialog(final String Detect_Type, final String mac, final String ssid) {
         NickNameDialog nickNameDialog = new NickNameDialog(this);
         nickNameDialog.setCancelable(false); // 버튼이외로 취소불가능
         nickNameDialog.setDialogListener(new NickNameDialog.CustomDialogListener() {
             @Override
             public void PositiveClick(String NickName) {
                 if (NickName.length() > 0) {
-                    wifiBluetoothListViewModel.insert(new WifiBluetoothList(Detect_Type, ssid, NickName, 0));
+                    wifiBluetoothListViewModel.insert(new WifiBluetoothList(Detect_Type, mac, ssid, NickName, 0));
                     mainRecyclerViewAdapter.notifyDataSetChanged();
                 } else {
-                    wifiBluetoothListViewModel.insert(new WifiBluetoothList(Detect_Type, ssid, ssid, 0));
+                    wifiBluetoothListViewModel.insert(new WifiBluetoothList(Detect_Type, mac, ssid, ssid, 0));
                     mainRecyclerViewAdapter.notifyDataSetChanged();
                 }
             }
@@ -224,6 +207,27 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         }
     }
 
+    private ResultReceiver resultReceiver = new ResultReceiver(new Handler()){
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            super.onReceiveResult(resultCode, resultData);
+
+            if (resultCode == 1){ // Bluetooth연결감지
+                try{
+                    setFirstDetectDialog(resultData.getString("DeviceType"), resultData.getString("Mac"),resultData.getString("SSID"));
+                }catch (NullPointerException e){
+
+                }
+            }else if (resultCode == 2) { // Wifi연결감지
+                try {
+                    setFirstDetectDialog(resultData.getString("DeviceType"), resultData.getString("Mac"), resultData.getString("SSID"));
+                }catch (NullPointerException e){
+
+                }
+            }
+        }
+    };
+
     public void AutoService() {
         // TODO : 출처 : https://forest71.tistory.com/185
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
@@ -239,10 +243,14 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         }
 
         if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) {
-            startService(new Intent(MainActivity.this, BluetoothWifiService.class));
+            Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);
+            intent.putExtra("RECEIVER", resultReceiver);
+            startService(intent);
         } else {
-            stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
-            startService(new Intent(MainActivity.this, BluetoothWifiService.class));
+            Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);
+            stopService(intent);
+            intent.putExtra("RECEIVER", resultReceiver);
+            startService(intent);
         }
 
 
@@ -260,8 +268,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
     }
 
 
@@ -281,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                             @Override
                             public void PositiveClick(String NickName) {
                                 //TODO : 업데이트문 실행
-                                wifiBluetoothListViewModel.update(list.get(position).getSSID(), NickName);
+                                wifiBluetoothListViewModel.update(list.get(position).getMac(), NickName);
                                 mainRecyclerViewAdapter.notifyDataSetChanged();
                             }
 
@@ -294,8 +300,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                         break;
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
-                        wifiBluetoothListViewModel.delete(list.get(position).getSSID());
-                        contentListViewModel.DeleteAll(list.get(position).getSSID());
+                        wifiBluetoothListViewModel.delete(list.get(position).getMac());
+                        contentListViewModel.DeleteAll(list.get(position).getMac());
                         mainRecyclerViewAdapter.notifyDataSetChanged();
                         break;
                 }
@@ -309,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public void onItemClick(View v, int position) {
         Intent intent = new Intent(MainActivity.this, Contents.class);
         intent.putExtra("SSID", list.get(position).getSSID());
+        intent.putExtra("Mac", list.get(position).getMac());
         startActivityForResult(intent, 100);
     }
 
@@ -317,8 +324,13 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
             if (resultCode == 200) {
-                wifiBluetoothListViewModel.updateCount(data.getStringExtra("SSID"), data.getIntExtra("SIZE", 0));
-                mainRecyclerViewAdapter.notifyDataSetChanged();
+                try {
+                    wifiBluetoothListViewModel.updateCount(data.getStringExtra("Mac"), data.getIntExtra("SIZE", 0));
+                    mainRecyclerViewAdapter.notifyDataSetChanged();
+                }catch (NullPointerException e){
+                    Log.e("Data : " , "NULL");
+                    RecyclerViewlist_init();
+                }
             }
         }
     }
@@ -376,11 +388,15 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        contentListViewModel.Insert(new ContentList(Selected, editText.getText().toString() ));
+                        if (editText.getText().length() > 0) {
+                            contentListViewModel.Insert(new ContentList(list.get(i).getMac(), Selected, editText.getText().toString()));
+                            dialogInterface.dismiss();
+                        }
+                        else
+                            StartToast("일정 내용을 입력해주세요");
                     }
                 });
                 dlg.setNegativeButton("취소",null);
-                Log.e("TAG", list.get(0).getSSID()); //담긴거 나옴 olleh_giga
                 dlg.show();
                 break;
 

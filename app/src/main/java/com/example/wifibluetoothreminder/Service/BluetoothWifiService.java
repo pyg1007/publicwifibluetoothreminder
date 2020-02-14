@@ -5,8 +5,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -15,7 +18,9 @@ import android.net.NetworkRequest;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -38,10 +43,12 @@ import java.util.List;
 public class BluetoothWifiService extends Service {
 
     public boolean RestartCheck;
+    public Intent mIntent;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        mIntent = intent;
         RestartCheck = intent.getBooleanExtra("Restart", false);
 
         WifiStatus();
@@ -97,6 +104,13 @@ public class BluetoothWifiService extends Service {
         return Name;
     }
 
+    public String getWifiMacName(){
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = wifiManager.getConnectionInfo();
+        String Mac = info.getMacAddress();
+        return Mac;
+    }
+
     public void WifiStatus() {
         ConnectivityManager CM = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkRequest networkRequest = new NetworkRequest.Builder()
@@ -133,7 +147,7 @@ public class BluetoothWifiService extends Service {
                             // TODO : 디비에 존재하지 않고, 백그라운드가 아닐 때 등록 다이얼로그
                             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                             notificationManager.cancel(3);
-                            sendMessage("Wifi", getWifiName());
+                            sendMessage(2, "Wifi", getWifiMacName(), getWifiName());
                         }
                     } else if (isExist(getWifiName())) {
                         if (ForeGround.get().isBackGround() || RestartCheck) {
@@ -206,22 +220,38 @@ public class BluetoothWifiService extends Service {
         }
     }
 
-    public void sendMessage(String DeviceType, String SSID) {
-        Intent intent = new Intent("Service-Activity");
-        intent.putExtra("DeviceType", DeviceType);
-        intent.putExtra("SSID", SSID);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    public void sendMessage(int resultCode, String DeviceType, String Mac, String SSID) {
+        Bundle bundle = new Bundle();
+        final ResultReceiver resultReceiver = mIntent.getParcelableExtra("RECEIVER");
+        bundle.putString("DeviceType", DeviceType);
+        bundle.putString("Mac", Mac);
+        bundle.putString("SSID", SSID);
+        resultReceiver.send(resultCode, bundle);
     }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())){
+                sendMessage(1, "Bluetooth", device.getAddress(), device.getName());
+            }
+        }
+    };
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         setAlarmTimer();
+        unregisterReceiver(broadcastReceiver);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     @Override

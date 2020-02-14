@@ -26,7 +26,7 @@ import java.util.List;
 
 public class Contents extends AppCompatActivity implements ContentsModelAdapter.OnListItemClickInterface, ContentsModelAdapter.OnListItemLongClickInterface, View.OnClickListener{
 
-    private String SSID;
+    private String Mac, SSID;
     private List<ContentList> item;
     private RecyclerView recyclerView;
     private ContentsModelAdapter contentsModelAdapter;
@@ -49,10 +49,8 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 item.clear();
                 if (contentLists.size() != 0){
                     for(ContentList contentList : contentLists)
-                        item.add(contentList);
-                }
-                for (int i = 0; i<item.size(); i++) {
-                    Log.e("TAG :", String.valueOf(item.get(i).ID) + " : " + item.get(i).Content + " : " + item.get(i).Content_SSID);
+                        if (contentList.getMac().equals(Mac))
+                            item.add(contentList);
                 }
                 contentsModelAdapter.notifyDataSetChanged();
             }
@@ -78,14 +76,16 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
     public void getData(){
         Intent intent = getIntent();
+        Mac = intent.getStringExtra("Mac");
         SSID = intent.getStringExtra("SSID");
     }
 
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
-        intent.putExtra("SSID", SSID);
+        intent.putExtra("Mac", Mac);
         intent.putExtra("SIZE", item.size());
+        Log.e("Contents", Mac + item.size());
         setResult(200);
         super.onBackPressed();
     }
@@ -141,7 +141,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
                     @Override
                     public void PositiveClick(String Contents) {
-                        contentListViewModel.Insert(new ContentList(SSID, Contents));
+                        contentListViewModel.Insert(new ContentList(Mac, SSID, Contents));
                         contentsModelAdapter.notifyDataSetChanged();
 
                     }

@@ -89,7 +89,6 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull MainRecyclerViewAdapter.CoustomViewHolder holder, int position) {
-        Log.e("TAG : " , itemList.get(position).getSSID());
         holder.NickName.setText(itemList.get(position).getNickName());
         holder.ContentsCount.setText(String.valueOf(itemList.get(position).getCount()));
         if (itemList.get(position).getDevice_Type().equals("Wifi"))

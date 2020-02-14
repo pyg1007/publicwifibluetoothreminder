@@ -12,6 +12,9 @@ public class WifiBluetoothList {
 
     @NonNull
     @PrimaryKey
+    public String Mac;
+
+    @NonNull
     public String SSID;
 
     @NonNull
@@ -20,11 +23,17 @@ public class WifiBluetoothList {
     @NonNull
     public int Count;
 
-    public WifiBluetoothList(@NonNull String Device_Type, @NonNull String SSID, @NonNull String NickName, @NonNull int Count){
+    public WifiBluetoothList(@NonNull String Device_Type, @NonNull String Mac, @NonNull String SSID, @NonNull String NickName, @NonNull int Count){
         this.Device_Type = Device_Type;
+        this.Mac = Mac;
         this.SSID = SSID;
         this.NickName = NickName;
         this.Count = Count;
+    }
+
+    @NonNull
+    public String getMac() {
+        return Mac;
     }
 
     @NonNull

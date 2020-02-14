@@ -20,12 +20,12 @@ public interface WifiBluetoothListDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(WifiBluetoothList wifiBluetoothList);
 
-    @Query("UPDATE wb_table SET NickName = :NickName WHERE SSID = :SSID")
-    void update(String SSID, String NickName);
+    @Query("UPDATE wb_table SET NickName = :NickName WHERE Mac = :Mac")
+    void update(String Mac, String NickName);
 
-    @Query("UPDATE wb_table SET Count = :Count WHERE SSID = :SSID")
-    void updateCount(String SSID, int Count);
+    @Query("UPDATE wb_table SET Count = :Count WHERE Mac = :Mac")
+    void updateCount(String Mac, int Count);
 
-    @Query("Delete FROM wb_table WHERE SSID = :SSID")
-    void delete(String SSID);
+    @Query("Delete FROM wb_table WHERE SSID = :Mac")
+    void delete(String Mac);
 }
