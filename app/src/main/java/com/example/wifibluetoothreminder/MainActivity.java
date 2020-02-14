@@ -45,7 +45,6 @@ import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.ViewModel.ContentListViewModel;
 import com.example.wifibluetoothreminder.ViewModel.WifiBluetoothListViewModel;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,13 +76,15 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             @Override
             public void onChanged(List<WifiBluetoothList> wifiBluetoothLists) {
                 list.clear();
-                if (wifiBluetoothLists.size() != 0){
-                    for(WifiBluetoothList wifiBluetoothList : wifiBluetoothLists)
+                if (wifiBluetoothLists.size() != 0) {
+                    for (WifiBluetoothList wifiBluetoothList : wifiBluetoothLists)
                         list.add(wifiBluetoothList);
                 }
                 mainRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
+
+        RecyclerViewlist_init();
     }
 
     @Override
@@ -123,11 +124,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
         mainRecyclerViewAdapter = new MainRecyclerViewAdapter(list, MainActivity.this, MainActivity.this);
         recyclerView.setAdapter(mainRecyclerViewAdapter);
-
-        RecyclerViewlist_init();
     }
 
-    public void RecyclerViewlist_init(){
+    public void RecyclerViewlist_init() {
         Runnable update = new Runnable() {
             @Override
             public void run() {
@@ -135,9 +134,12 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 ContentListDao dao = listDatabase.contentListDao();
                 WifiBluetoothListDao wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
                 List<WifiBluetoothList> lists = wifiBluetoothListDao.getAll_Service(); // Content에서 뒤로가기 시에는 list에 값이 존재하지만, 최초실행시는 존재하지 않기 때문에 값을 가져옴.
-                for (int i = 0; i<lists.size(); i++) {
+                for (int i = 0; i < lists.size(); i++) {
                     List<ContentList> item = dao.getItem(lists.get(i).getSSID());
-                    wifiBluetoothListViewModel.updateCount(lists.get(i).getSSID(), item.size());
+                    StartLog("SSID :" , lists.get(i).getSSID());
+                    StartLog("Size :" , String.valueOf(item.size()));
+                    if (item.size() != 0)
+                        wifiBluetoothListViewModel.updateCount(lists.get(i).getSSID(), item.size());
                 }
                 handler.sendEmptyMessage(100);
             }
@@ -166,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
             }
         });
-        if(!nickNameDialog.isShowing())
+        if (!nickNameDialog.isShowing())
             nickNameDialog.show();
     }
 
@@ -177,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
             if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED || ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED)
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_LOCATION);
-            else if(ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED)
+            else if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED)
                 AutoService();
         }
     }
@@ -222,9 +224,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             startActivity(intent);
         }
 
-        if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")){
+        if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) {
             startService(new Intent(MainActivity.this, BluetoothWifiService.class));
-        }else{
+        } else {
             stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
             startService(new Intent(MainActivity.this, BluetoothWifiService.class));
         }
@@ -293,25 +295,25 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public void onItemClick(View v, int position) {
         Intent intent = new Intent(MainActivity.this, Contents.class);
         intent.putExtra("SSID", list.get(position).getSSID());
-        startActivityForResult(intent,100);
+        startActivityForResult(intent, 100);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
-            if (resultCode == 200){
-                wifiBluetoothListViewModel.updateCount(data.getStringExtra("SSID"), data.getIntExtra("SIZE",0));
+            if (resultCode == 200) {
+                wifiBluetoothListViewModel.updateCount(data.getStringExtra("SSID"), data.getIntExtra("SIZE", 0));
                 mainRecyclerViewAdapter.notifyDataSetChanged();
             }
         }
     }
 
     @SuppressLint("HandlerLeak")
-    Handler handler =new Handler(){
+    Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
+            switch (msg.what) {
                 case 100:
                     mainRecyclerViewAdapter.notifyDataSetChanged();
             }

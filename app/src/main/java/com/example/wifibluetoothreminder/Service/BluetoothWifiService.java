@@ -1,6 +1,5 @@
 package com.example.wifibluetoothreminder.Service;
 
-import android.Manifest;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -23,7 +22,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.wifibluetoothreminder.AlarmReceiver;
-import com.example.wifibluetoothreminder.Contents;
 import com.example.wifibluetoothreminder.MainActivity;
 import com.example.wifibluetoothreminder.R;
 import com.example.wifibluetoothreminder.Room.ContentList;
@@ -110,8 +108,6 @@ public class BluetoothWifiService extends Service {
 
             @Override
             public void onAvailable(Network network) {
-
-                Log.e("onAvailable : ", "onAvailable");
                 if (checkGPSService()) {
                     if (!isExist(getWifiName())) {
                         if (ForeGround.get().isBackGround() || RestartCheck) {
