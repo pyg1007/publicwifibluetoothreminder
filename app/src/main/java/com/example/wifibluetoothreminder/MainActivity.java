@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,9 +29,14 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.PopupMenu;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.wifibluetoothreminder.CustomDialog.NickNameDialog;
@@ -41,6 +47,7 @@ import com.example.wifibluetoothreminder.Room.ListDatabase;
 import com.example.wifibluetoothreminder.Room.WifiBluetoothList;
 import com.example.wifibluetoothreminder.Room.WifiBluetoothListDao;
 import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
+import com.example.wifibluetoothreminder.Service.BluetoothService;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.ViewModel.ContentListViewModel;
 import com.example.wifibluetoothreminder.ViewModel.WifiBluetoothListViewModel;
@@ -49,6 +56,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MainRecyclerViewAdapter.OnListItemLongClickInterface, MainRecyclerViewAdapter.OnListItemClickInterface {
+
 
     // 변경되지 않을 상수
     private static final int REQUEST_ACCESS_LOCATION = 1000;
@@ -59,8 +67,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
     private WifiBluetoothListViewModel wifiBluetoothListViewModel;
     private ContentListViewModel contentListViewModel;
-
+    View dialogView;
     ServiceRunningCheck serviceRunningCheck;
+    String Selected = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,11 +111,16 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            BluetoothService bluetoothService = new BluetoothService();
+
             if ("Service-Activity".equals(intent.getAction())) {
                 String Detect_Type = intent.getStringExtra("DeviceType");
                 String SSID = intent.getStringExtra("SSID");
                 if (Detect_Type != null && SSID != null)
                     setFirstDetectDialog(Detect_Type, SSID);
+            }
+            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())) {
+                bluetoothService.getLocalBluetoothName();
             }
         }
     };
@@ -320,4 +334,57 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         }
     };
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        menu.add(0,1,0,"등록");
+        menu.add(0,2,0,"삭제");
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case 1:
+                dialogView = (View) View.inflate(MainActivity.this,R.layout.menudialog,null);
+                Spinner spinner = dialogView.findViewById(R.id.spinner);
+                ArrayList<String> ssid_List = new ArrayList<>();
+                for (int i = 0; i < list.size(); i++){
+                    ssid_List.add(list.get(i).getSSID());
+                }
+
+                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, ssid_List);
+                spinner.setAdapter(arrayAdapter);
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        Selected = adapterView.getItemAtPosition(i).toString();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
+                final EditText editText = dialogView.findViewById(R.id.editText2);
+                AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
+                dlg.setTitle("일정 등록");
+                dlg.setIcon(R.drawable.ic_wifi_black_24dp); // 아이콘 수정해야함
+                dlg.setView(dialogView);
+                dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        contentListViewModel.Insert(new ContentList(Selected, editText.getText().toString() ));
+                    }
+                });
+                dlg.setNegativeButton("취소",null);
+                Log.e("TAG", list.get(0).getSSID()); //담긴거 나옴 olleh_giga
+                dlg.show();
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
