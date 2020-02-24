@@ -59,11 +59,11 @@ public class ContentListRepository {
         executor.execute(delete);
     }
 
-    public void DeleteAll(final String Content_SSID) {
+    public void DeleteAll(final String Mac) {
         Runnable delete = new Runnable() {
             @Override
             public void run() {
-                contentListDao.Delete_All(Content_SSID);
+                contentListDao.Delete_All(Mac);
             }
         };
         Executor executor = Executors.newSingleThreadScheduledExecutor();

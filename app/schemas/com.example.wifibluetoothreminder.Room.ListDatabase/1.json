@@ -1,16 +1,22 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "ff3e3f8c720c7cf5bbb598640c0a2c1d",
+    "version": 1,
+    "identityHash": "870d83b0a58fba72242288d0f56c543a",
     "entities": [
       {
         "tableName": "wb_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Device_Type` TEXT NOT NULL, `SSID` TEXT NOT NULL, `NickName` TEXT NOT NULL, `Count` INTEGER NOT NULL, PRIMARY KEY(`SSID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Device_Type` TEXT NOT NULL, `Mac` TEXT NOT NULL, `SSID` TEXT NOT NULL, `NickName` TEXT NOT NULL, `Count` INTEGER NOT NULL, PRIMARY KEY(`Mac`))",
         "fields": [
           {
             "fieldPath": "Device_Type",
             "columnName": "Device_Type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Mac",
+            "columnName": "Mac",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -35,7 +41,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "SSID"
+            "Mac"
           ],
           "autoGenerate": false
         },
@@ -44,12 +50,18 @@
       },
       {
         "tableName": "Content_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `Content_SSID` TEXT NOT NULL, `Content` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `Mac` TEXT NOT NULL, `Content_SSID` TEXT NOT NULL, `Content` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "ID",
             "columnName": "ID",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "Mac",
+            "columnName": "Mac",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -78,7 +90,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ff3e3f8c720c7cf5bbb598640c0a2c1d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '870d83b0a58fba72242288d0f56c543a')"
     ]
   }
 }

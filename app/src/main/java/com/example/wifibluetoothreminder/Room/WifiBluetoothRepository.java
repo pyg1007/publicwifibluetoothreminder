@@ -38,33 +38,33 @@ public class WifiBluetoothRepository {
         IO.execute(addRunnable);
     }
 
-    public void update(final String SSID, final String NickName){
+    public void update(final String Mac, final String NickName){
         Runnable updateRunnable = new Runnable() {
             @Override
             public void run() {
-                wifiBluetoothListDao.update(SSID, NickName);
+                wifiBluetoothListDao.update(Mac, NickName);
             }
         };
         Executor Update = Executors.newSingleThreadExecutor();
         Update.execute(updateRunnable);
     }
 
-    public void updatecount(final String SSID, final int Count){
+    public void updatecount(final String Mac, final int Count){
         Runnable updateRunnable = new Runnable() {
             @Override
             public void run() {
-                wifiBluetoothListDao.updateCount(SSID, Count);
+                wifiBluetoothListDao.updateCount(Mac, Count);
             }
         };
         Executor Update = Executors.newSingleThreadExecutor();
         Update.execute(updateRunnable);
     }
 
-    public void delete(final String SSID){
+    public void delete(final String Mac){
         Runnable deleteRunnable = new Runnable() {
             @Override
             public void run() {
-                wifiBluetoothListDao.delete(SSID);
+                wifiBluetoothListDao.delete(Mac);
             }
         };
         Executor Delete = Executors.newSingleThreadExecutor();
