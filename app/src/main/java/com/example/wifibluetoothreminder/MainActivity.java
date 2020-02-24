@@ -384,6 +384,21 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 dlg.show();
                 break;
 
+            case 2: //여기 취소하는 체크박스
+                final String[] versionArray = new String[]{"아","하"};
+                final boolean[] checkarray = new boolean[]{false, false};
+                AlertDialog.Builder dlg2 = new AlertDialog.Builder(MainActivity.this);
+                dlg2.setTitle("일정 삭제");
+                dlg2.setIcon(R.drawable.ic_wifi_black_24dp);
+                dlg2.setMultiChoiceItems(versionArray, checkarray, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which, boolean ischecked) {
+
+                    }
+                });
+                dlg2.setPositiveButton("확인",null);
+                dlg2.show();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
