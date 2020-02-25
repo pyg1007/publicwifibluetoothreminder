@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
@@ -21,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public List<WifiBluetoothList> list;
     public RecyclerView recyclerView;
     public MainRecyclerViewAdapter mainRecyclerViewAdapter;
+    private Toolbar toolbar;
 
     private WifiBluetoothListViewModel wifiBluetoothListViewModel;
     private ContentListViewModel contentListViewModel;
@@ -121,6 +124,12 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
         mainRecyclerViewAdapter = new MainRecyclerViewAdapter(list, MainActivity.this, MainActivity.this);
         recyclerView.setAdapter(mainRecyclerViewAdapter);
+
+        toolbar = findViewById(R.id.MainToolbar);
+        toolbar.setTitle("와이파이/블루투스 리마인더");
+        toolbar.setBackgroundColor(Color.BLACK);
+        toolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(toolbar);
     }
 
     public void RecyclerViewlist_init() {
@@ -133,8 +142,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 List<WifiBluetoothList> lists = wifiBluetoothListDao.getAll_Service(); // Content에서 뒤로가기 시에는 list에 값이 존재하지만, 최초실행시는 존재하지 않기 때문에 값을 가져옴.
                 for (int i = 0; i < lists.size(); i++) {
                     List<ContentList> item = dao.getItem(lists.get(i).getMac());
-                    StartLog("SSID :" , lists.get(i).getSSID());
-                    StartLog("Size :" , String.valueOf(item.size()));
+                    StartLog("SSID :", lists.get(i).getSSID());
+                    StartLog("Size :", String.valueOf(item.size()));
                     if (item.size() != 0)
                         wifiBluetoothListViewModel.updateCount(lists.get(i).getMac(), item.size());
                 }
@@ -207,21 +216,21 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         }
     }
 
-    private ResultReceiver resultReceiver = new ResultReceiver(new Handler()){
+    private ResultReceiver resultReceiver = new ResultReceiver(new Handler()) {
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             super.onReceiveResult(resultCode, resultData);
 
-            if (resultCode == 1){ // Bluetooth연결감지
-                try{
-                    setFirstDetectDialog(resultData.getString("DeviceType"), resultData.getString("Mac"),resultData.getString("SSID"));
-                }catch (NullPointerException e){
-
-                }
-            }else if (resultCode == 2) { // Wifi연결감지
+            if (resultCode == 1) { // Bluetooth연결감지
                 try {
                     setFirstDetectDialog(resultData.getString("DeviceType"), resultData.getString("Mac"), resultData.getString("SSID"));
-                }catch (NullPointerException e){
+                } catch (NullPointerException e) {
+
+                }
+            } else if (resultCode == 2) { // Wifi연결감지
+                try {
+                    setFirstDetectDialog(resultData.getString("DeviceType"), resultData.getString("Mac"), resultData.getString("SSID"));
+                } catch (NullPointerException e) {
 
                 }
             }
@@ -316,6 +325,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         Intent intent = new Intent(MainActivity.this, Contents.class);
         intent.putExtra("SSID", list.get(position).getSSID());
         intent.putExtra("Mac", list.get(position).getMac());
+        intent.putExtra("NickName", list.get(position).getNickName());
         startActivityForResult(intent, 100);
     }
 
@@ -327,8 +337,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 try {
                     wifiBluetoothListViewModel.updateCount(data.getStringExtra("Mac"), data.getIntExtra("SIZE", 0));
                     mainRecyclerViewAdapter.notifyDataSetChanged();
-                }catch (NullPointerException e){
-                    Log.e("Data : " , "NULL");
+                } catch (NullPointerException e) {
+                    Log.e("Data : ", "NULL");
                     RecyclerViewlist_init();
                 }
             }
@@ -348,23 +358,19 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-
-        menu.add(0,1,0,"등록");
-        menu.add(0,2,0,"삭제");
-
-        return true;
+        getMenuInflater().inflate(R.menu.maintoobar_action, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
-            case 1:
-                dialogView = (View) View.inflate(MainActivity.this,R.layout.menudialog,null);
+        switch (item.getItemId()) {
+            case R.id.Add:
+                dialogView = (View) View.inflate(MainActivity.this, R.layout.menudialog, null);
                 Spinner spinner = dialogView.findViewById(R.id.spinner);
                 ArrayList<String> ssid_List = new ArrayList<>();
-                for (int i = 0; i < list.size(); i++){
-                    ssid_List.add(list.get(i).getSSID());
+                for (int i = 0; i < list.size(); i++) {
+                    ssid_List.add(list.get(i).getNickName());
                 }
 
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, ssid_List);
@@ -383,39 +389,29 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 final EditText editText = dialogView.findViewById(R.id.editText2);
                 AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
                 dlg.setTitle("일정 등록");
-                dlg.setIcon(R.drawable.ic_wifi_black_24dp); // 아이콘 수정해야함
                 dlg.setView(dialogView);
                 dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (editText.getText().length() > 0) {
                             contentListViewModel.Insert(new ContentList(list.get(i).getMac(), Selected, editText.getText().toString()));
-                            dialogInterface.dismiss();
-                        }
-                        else
+                        } else
                             StartToast("일정 내용을 입력해주세요");
                     }
                 });
-                dlg.setNegativeButton("취소",null);
+                dlg.setNegativeButton("취소", null);
+//                final AlertDialog alertDialog = dlg.create();
+//                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//
+//                    }
+//                });
                 dlg.show();
-                break;
-
-            case 2: //여기 취소하는 체크박스
-                final String[] versionArray = new String[]{"아","하"};
-                final boolean[] checkarray = new boolean[]{false, false};
-                AlertDialog.Builder dlg2 = new AlertDialog.Builder(MainActivity.this);
-                dlg2.setTitle("일정 삭제");
-                dlg2.setIcon(R.drawable.ic_wifi_black_24dp);
-                dlg2.setMultiChoiceItems(versionArray, checkarray, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int which, boolean ischecked) {
-
-                    }
-                });
-                dlg2.setPositiveButton("확인",null);
-                dlg2.show();
-                break;
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+
     }
 }

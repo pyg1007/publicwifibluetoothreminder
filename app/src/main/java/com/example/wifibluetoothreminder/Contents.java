@@ -1,16 +1,21 @@
 package com.example.wifibluetoothreminder;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -24,16 +29,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Contents extends AppCompatActivity implements ContentsModelAdapter.OnListItemClickInterface, ContentsModelAdapter.OnListItemLongClickInterface, View.OnClickListener{
+public class Contents extends AppCompatActivity implements ContentsModelAdapter.OnListItemClickInterface, ContentsModelAdapter.OnListItemLongClickInterface{
 
-    private String Mac, SSID;
+    private String Mac, SSID, NickName;
     private List<ContentList> item;
     private RecyclerView recyclerView;
+    private Toolbar toolbar;
     private ContentsModelAdapter contentsModelAdapter;
 
     private ContentListViewModel contentListViewModel;
 
-    private FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +52,8 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
             @Override
             public void onChanged(List<ContentList> contentLists) {
                 item.clear();
-                if (contentLists.size() != 0){
-                    for(ContentList contentList : contentLists)
+                if (contentLists.size() != 0) {
+                    for (ContentList contentList : contentLists)
                         if (contentList.getMac().equals(Mac))
                             item.add(contentList);
                 }
@@ -57,7 +62,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         });
     }
 
-    public void UI(){ // UI여기서 작업
+    public void UI() { // UI여기서 작업
         getData();
 
         item = new ArrayList<>();
@@ -67,17 +72,21 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        contentsModelAdapter = new ContentsModelAdapter(item,Contents.this,Contents.this);
+        contentsModelAdapter = new ContentsModelAdapter(item, Contents.this, Contents.this);
         recyclerView.setAdapter(contentsModelAdapter);
 
-        floatingActionButton = findViewById(R.id.Add);
-        floatingActionButton.setOnClickListener(this);
+        toolbar = findViewById(R.id.ContentsToolbar);
+        toolbar.setTitle(NickName + "의 일정");
+        toolbar.setBackgroundColor(Color.BLACK);
+        toolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(toolbar);
     }
 
-    public void getData(){
+    public void getData() {
         Intent intent = getIntent();
         Mac = intent.getStringExtra("Mac");
         SSID = intent.getStringExtra("SSID");
+        NickName = intent.getStringExtra("NickName");
     }
 
     @Override
@@ -85,7 +94,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         Intent intent = new Intent();
         intent.putExtra("Mac", Mac);
         intent.putExtra("SIZE", item.size());
-        Log.e("Contents", Mac + item.size());
         setResult(200);
         super.onBackPressed();
     }
@@ -129,13 +137,20 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
     @Override
     public void onItemClick(View v, int position) {
-        ContentsModelAdapter.CustomViewHoler customViewHoler = (ContentsModelAdapter.CustomViewHoler)recyclerView.findViewHolderForAdapterPosition(position);
+        ContentsModelAdapter.CustomViewHoler customViewHoler = (ContentsModelAdapter.CustomViewHoler) recyclerView.findViewHolderForAdapterPosition(position);
     }
     // 여기까지 리스트 클릭이벤트
 
+
     @Override
-    public void onClick(View view) {
-        switch (view.getId()){
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.contenttoolbar_action, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.Add:
                 ContentDialog dialog = new ContentDialog(Contents.this);
                 dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
@@ -143,16 +158,35 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                     public void PositiveClick(String Contents) {
                         contentListViewModel.Insert(new ContentList(Mac, SSID, Contents));
                         contentsModelAdapter.notifyDataSetChanged();
-
                     }
-
                     @Override
                     public void NegativeClick() {
 
                     }
                 });
                 dialog.show();
-                break;
+                return true;
+            case R.id.Select:
+                item.setIcon(R.drawable.ic_delete_24dp);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(contentsModelAdapter.getCheckedlist().size() +"개의 일정을 삭제 하시겠습니까?");
+                builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        item.setIcon(R.drawable.ic_check_24dp);
+                    }
+                });
+                builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        item.setIcon(R.drawable.ic_check_24dp);
+                    }
+                });
+                builder.show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+
     }
 }
