@@ -34,7 +34,7 @@ import java.util.List;
 public class Contents extends AppCompatActivity implements ContentsModelAdapter.OnListItemClickInterface, ContentsModelAdapter.OnListItemLongClickInterface{
 
     private String Mac, SSID, NickName;
-    private List<ContentList> item;
+    private List<ContentList> items;
     private RecyclerView recyclerView;
     private Toolbar toolbar;
     private ContentsModelAdapter contentsModelAdapter;
@@ -54,11 +54,11 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         contentListViewModel.getAll().observe(this, new Observer<List<ContentList>>() {
             @Override
             public void onChanged(List<ContentList> contentLists) {
-                item.clear();
+                items.clear();
                 if (contentLists.size() != 0) {
                     for (ContentList contentList : contentLists)
                         if (contentList.getMac().equals(Mac))
-                            item.add(contentList);
+                            items.add(contentList);
                 }
                 contentsModelAdapter.notifyDataSetChanged();
             }
@@ -68,7 +68,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     public void UI() { // UI여기서 작업
         getData();
 
-        item = new ArrayList<>();
+        items = new ArrayList<>();
 
         serviceRunningCheck = new ServiceRunningCheck(this);
         recyclerView = findViewById(R.id.ContentList);
@@ -76,7 +76,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        contentsModelAdapter = new ContentsModelAdapter(item, Contents.this, Contents.this);
+        contentsModelAdapter = new ContentsModelAdapter(items, Contents.this, Contents.this);
         recyclerView.setAdapter(contentsModelAdapter);
 
         toolbar = findViewById(R.id.ContentsToolbar);
@@ -84,6 +84,9 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         toolbar.setBackgroundColor(Color.BLACK);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
     }
 
     public void getData() {
@@ -97,7 +100,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     public void onBackPressed() {
         Intent intent = new Intent();
         intent.putExtra("Mac", Mac);
-        intent.putExtra("SIZE", item.size());
+        intent.putExtra("SIZE", items.size());
         setResult(200, intent);
         super.onBackPressed();
     }
@@ -110,7 +113,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         finish();
     }
 
-    // 여기서
     @Override
     public void onItemLongClick(View v, final int position) {
         PopupMenu popupMenu = new PopupMenu(this, v, Gravity.RIGHT);
@@ -124,7 +126,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
                             @Override
                             public void PositiveClick(String Contents) {
-                                contentListViewModel.Update(item.get(position).ID, Contents);
+                                contentListViewModel.Update(items.get(position).ID, Contents);
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
 
@@ -137,7 +139,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         break;
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
-                        contentListViewModel.Delete(item.get(position).ID, item.get(position).getContent());
+                        contentListViewModel.Delete(items.get(position).ID, items.get(position).getContent());
                         contentsModelAdapter.notifyDataSetChanged();
                         break;
                 }
@@ -151,8 +153,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     public void onItemClick(View v, int position) {
         ContentsModelAdapter.CustomViewHoler customViewHoler = (ContentsModelAdapter.CustomViewHoler) recyclerView.findViewHolderForAdapterPosition(position);
     }
-    // 여기까지 리스트 클릭이벤트
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -195,6 +195,13 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                     }
                 });
                 builder.show();
+                return true;
+            case android.R.id.home:
+                Intent intent = new Intent();
+                intent.putExtra("Mac", Mac);
+                intent.putExtra("SIZE", items.size());
+                setResult(200, intent);
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
