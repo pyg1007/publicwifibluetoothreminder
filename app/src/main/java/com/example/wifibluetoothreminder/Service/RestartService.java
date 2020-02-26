@@ -12,6 +12,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.wifibluetoothreminder.MainActivity;
 import com.example.wifibluetoothreminder.R;
@@ -19,15 +20,12 @@ import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
 
 public class RestartService extends Service {
 
-    ServiceRunningCheck serviceRunningCheck;
-
     public RestartService() {
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        serviceRunningCheck = new ServiceRunningCheck(this);
     }
 
     @Override
@@ -54,11 +52,9 @@ public class RestartService extends Service {
         startForeground(9, notification);
 
         /////////////////////////////////////////////////////////////////////
-        if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) {
-            Intent in = new Intent(this, BluetoothWifiService.class);
-            in.putExtra("Restart", true);
-            startService(in);
-        }
+        Intent in = new Intent(this, BluetoothWifiService.class);
+        startService(in);
+
 
         stopForeground(true);
         stopSelf();

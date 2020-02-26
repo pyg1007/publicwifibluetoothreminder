@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,7 +49,6 @@ import com.example.wifibluetoothreminder.Room.ListDatabase;
 import com.example.wifibluetoothreminder.Room.WifiBluetoothList;
 import com.example.wifibluetoothreminder.Room.WifiBluetoothListDao;
 import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
-import com.example.wifibluetoothreminder.Service.BluetoothService;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.ViewModel.ContentListViewModel;
 import com.example.wifibluetoothreminder.ViewModel.WifiBluetoothListViewModel;
@@ -73,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private ContentListViewModel contentListViewModel;
     private View dialogView;
     private ServiceRunningCheck serviceRunningCheck;
-    private String Selected = "";
+
+    private int SpinierPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +89,10 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             public void onChanged(List<WifiBluetoothList> wifiBluetoothLists) {
                 list.clear();
                 if (wifiBluetoothLists.size() != 0) {
-                    for (WifiBluetoothList wifiBluetoothList : wifiBluetoothLists)
-                        list.add(wifiBluetoothList);
+                    list.addAll(wifiBluetoothLists);
                 }
+                for ( int i = 0; i < list.size(); i++)
+                    Log.e("list : " , list.get(i).getMac() + list.get(i).getNickName());
                 mainRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
@@ -101,13 +101,24 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     }
 
     @Override
+    protected void onUserLeaveHint() { // Home키 관련
+        super.onUserLeaveHint();
+        if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
+            stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
+        finish();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        IntentFilter intentFilter = new IntentFilter("Service_to_Activity");
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
     }
 
 
@@ -130,6 +141,15 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         toolbar.setBackgroundColor(Color.BLACK);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
+
+        Bundle extra = getIntent().getExtras();
+        if (extra != null) {
+            try {
+                setFirstDetectDialog(extra.getString("DeviceType"), extra.getString("Mac"), extra.getString("SSID"));
+            } catch (NullPointerException e) {
+
+            }
+        }
     }
 
     public void RecyclerViewlist_init() {
@@ -142,10 +162,10 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 List<WifiBluetoothList> lists = wifiBluetoothListDao.getAll_Service(); // Content에서 뒤로가기 시에는 list에 값이 존재하지만, 최초실행시는 존재하지 않기 때문에 값을 가져옴.
                 for (int i = 0; i < lists.size(); i++) {
                     List<ContentList> item = dao.getItem(lists.get(i).getMac());
-                    StartLog("SSID :", lists.get(i).getSSID());
-                    StartLog("Size :", String.valueOf(item.size()));
                     if (item.size() != 0)
                         wifiBluetoothListViewModel.updateCount(lists.get(i).getMac(), item.size());
+                    else
+                        wifiBluetoothListViewModel.updateCount(lists.get(i).getMac(), 0);
                 }
                 handler.sendEmptyMessage(100);
             }
@@ -213,29 +233,10 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 }
             });
             builder.show();
+        }else{
+            AutoService();
         }
     }
-
-    private ResultReceiver resultReceiver = new ResultReceiver(new Handler()) {
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-            super.onReceiveResult(resultCode, resultData);
-
-            if (resultCode == 1) { // Bluetooth연결감지
-                try {
-                    setFirstDetectDialog(resultData.getString("DeviceType"), resultData.getString("Mac"), resultData.getString("SSID"));
-                } catch (NullPointerException e) {
-
-                }
-            } else if (resultCode == 2) { // Wifi연결감지
-                try {
-                    setFirstDetectDialog(resultData.getString("DeviceType"), resultData.getString("Mac"), resultData.getString("SSID"));
-                } catch (NullPointerException e) {
-
-                }
-            }
-        }
-    };
 
     public void AutoService() {
         // TODO : 출처 : https://forest71.tistory.com/185
@@ -253,18 +254,29 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
         if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) {
             Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);
-            intent.putExtra("RECEIVER", resultReceiver);
             startService(intent);
-        } else {
-            Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);
-            stopService(intent);
-            intent.putExtra("RECEIVER", resultReceiver);
-            startService(intent);
+        }else{
+            Intent intent = new Intent("Activity_to_Service");
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
-
-
     }
 
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ("Service_to_Activity".equals(intent.getAction())){
+                try {
+                    String DeviceType = intent.getStringExtra("DeviceType");
+                    String Mac = intent.getStringExtra("Mac");
+                    String SSID = intent.getStringExtra("SSID");
+                    if (DeviceType != null && Mac != null && SSID != null)
+                        setFirstDetectDialog(DeviceType, Mac, SSID);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
 
     public void StartLog(String TAG, String msg) { // 빨간색로그
         Log.e(TAG, msg);
@@ -277,6 +289,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
+            stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
+        Log.e("Activity : ", "onDestroy");
     }
 
 
@@ -291,6 +306,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 switch (menuItem.getItemId()) {
                     case R.id.edit: // 편집
                         NickNameDialog mainListDialog = new NickNameDialog(MainActivity.this);
+                        StartLog("SSID : ", list.get(position).getSSID());
                         mainListDialog.setCancelable(false);
                         mainListDialog.setDialogListener(new NickNameDialog.CustomDialogListener() {
                             @Override
@@ -338,8 +354,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                     wifiBluetoothListViewModel.updateCount(data.getStringExtra("Mac"), data.getIntExtra("SIZE", 0));
                     mainRecyclerViewAdapter.notifyDataSetChanged();
                 } catch (NullPointerException e) {
-                    Log.e("Data : ", "NULL");
-                    RecyclerViewlist_init();
+                    e.printStackTrace();
                 }
             }
         }
@@ -378,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        Selected = adapterView.getItemAtPosition(i).toString();
+                        SpinierPosition = i;
                     }
 
                     @Override
@@ -390,28 +405,25 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
                 dlg.setTitle("일정 등록");
                 dlg.setView(dialogView);
-                dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                dlg.setPositiveButton("확인", null);
+                dlg.setNegativeButton("취소", null);
+                final AlertDialog alertDialog = dlg.create();
+                alertDialog.show();
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                    public void onClick(View view) {
                         if (editText.getText().length() > 0) {
-                            contentListViewModel.Insert(new ContentList(list.get(i).getMac(), Selected, editText.getText().toString()));
+                            contentListViewModel.Insert(new ContentList(list.get(SpinierPosition).getMac(), list.get(SpinierPosition).getSSID(), editText.getText().toString()));
+                            wifiBluetoothListViewModel.updateCount(list.get(SpinierPosition).getMac(), list.get(SpinierPosition).getCount() + 1);
+                            mainRecyclerViewAdapter.notifyDataSetChanged();
+                            alertDialog.dismiss();
                         } else
                             StartToast("일정 내용을 입력해주세요");
                     }
                 });
-                dlg.setNegativeButton("취소", null);
-//                final AlertDialog alertDialog = dlg.create();
-//                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//
-//                    }
-//                });
-                dlg.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 }

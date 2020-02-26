@@ -5,12 +5,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -18,10 +16,9 @@ import android.net.NetworkRequest;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.os.ResultReceiver;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -42,31 +39,40 @@ import java.util.List;
 
 public class BluetoothWifiService extends Service {
 
-    public boolean RestartCheck;
-    public Intent mIntent;
+    private boolean isEnableWifi = false;
+
+    private String NickName;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        mIntent = intent;
-        RestartCheck = intent.getBooleanExtra("Restart", false);
 
         WifiStatus();
 
         return START_NOT_STICKY;
     }
 
-    public boolean isExist(String SSID) { // 디비에 SSID가 존재하는지 유무
+    public boolean isExist(String Mac) { // 디비에 Mac이 존재하는지 유무
         boolean check = false;
-        ListDatabase listDatabase = ListDatabase.getDatabase(getApplication());
-        WifiBluetoothListDao wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
-        List<WifiBluetoothList> list = wifiBluetoothListDao.getAll_Service();
-        List<String> ssid_list = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            ssid_list.add(list.get(i).getSSID());
+        final List<String> ssid_list = new ArrayList<>();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ListDatabase listDatabase = ListDatabase.getDatabase(getApplication());
+                WifiBluetoothListDao wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
+                List<WifiBluetoothList> list = wifiBluetoothListDao.getAll_Service();
+                for (int i = 0; i < list.size(); i++) {
+                    ssid_list.add(list.get(i).getMac());
+                }
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         for (String str : ssid_list) {
-            if (SSID.equals(str)) {
+            if (Mac.equals(str)) {
                 check = true;
                 break;
             }
@@ -74,19 +80,11 @@ public class BluetoothWifiService extends Service {
         return check;
     }
 
-    public boolean checkGPSService() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            return false;
-        }
-        return true;
-    }
-
-    public List<String> isContentExist(String SSID) {
+    public List<String> isContentExist(String Mac) {
 
         ListDatabase listDatabase = ListDatabase.getDatabase(getApplication());
         ContentListDao contentListDao = listDatabase.contentListDao();
-        List<ContentList> list = contentListDao.getItem(SSID);
+        List<ContentList> list = contentListDao.getItem(Mac);
         List<String> content = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
@@ -104,11 +102,36 @@ public class BluetoothWifiService extends Service {
         return Name;
     }
 
-    public String getWifiMacName(){
+    public String getWifiMacName() {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = wifiManager.getConnectionInfo();
         String Mac = info.getMacAddress();
         return Mac;
+    }
+
+    public String getWifiNickName(final String Mac) {
+        NickName = null;
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ListDatabase listDatabase = ListDatabase.getDatabase(getApplication());
+                WifiBluetoothListDao wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
+                List<WifiBluetoothList> list = wifiBluetoothListDao.getAll_Service();
+                for (int i = 0; i < list.size(); i++) {
+                    if (list.get(i).getMac().equals(Mac)) {
+                        NickName = list.get(i).getNickName();
+                        break;
+                    }
+                }
+            }
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return NickName;
     }
 
     public void WifiStatus() {
@@ -122,119 +145,139 @@ public class BluetoothWifiService extends Service {
 
             @Override
             public void onAvailable(Network network) {
-                if (checkGPSService()) {
-                    if (!isExist(getWifiName())) {
-                        if (ForeGround.get().isBackGround() || RestartCheck) {
-                            // TODO : 디비에 존재하지 않고, 백그라운드일 때 노티피 알림
-                            Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            PendingIntent pendingIntent = PendingIntent.getActivity(BluetoothWifiService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT); // 노티피 클릭시 이동할 수 있는 인텐트
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                String ChannelID = "Channel_1";
-                                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                                NotificationChannel Noti = new NotificationChannel(ChannelID, "android", NotificationManager.IMPORTANCE_DEFAULT);
-                                NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-                                builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText("WIFI가 연결되었습니다. 등록하시겠습니까?").setContentTitle("WIFI 연결감지").setAutoCancel(true);
-                                notificationManager.createNotificationChannel(Noti);
-                                notificationManager.notify(3, builder.build());
-                            } else {
-                                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                                NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, "Channel_2");
-                                builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText("WIFI가 연결되었습니다. 등록하시겠습니까?").setContentTitle("WIFI 연결감지").setAutoCancel(true);
-                                notificationManager.notify(3, builder.build());
+                isEnableWifi = true;
+                if (!isExist(getWifiMacName())) {
+                    if (ForeGround.get().isBackGround()) {
+                        String ChannelID = "ChannelID_1";
+                        String ChannelName = "Wifi";
+                        int Notification_id = 3;
+                        String Title = "Wifi 연결 감지";
+                        String Content = "Wifi 연결 감지, 연결하시겠습니까?";
+                        String DeviceType = "Wifi";
+                        setNotification(ChannelID, ChannelName, Notification_id, Title, Content, DeviceType, getWifiMacName(), getWifiName());
+                    } else if (!ForeGround.get().isBackGround()) {
+                        int Notification_id = 3;
+                        Intent action = new Intent("Service_to_Activity");
+                        action.putExtra("DeviceType", "Wifi");
+                        action.putExtra("Mac", getWifiMacName());
+                        action.putExtra("SSID", getWifiName());
+                        LocalBroadcastManager.getInstance(BluetoothWifiService.this).sendBroadcast(action);
+                        CancleNotification(Notification_id);
+                    }
+                } else {
+                    if (ForeGround.get().isBackGround()) {
+                        List<String> Contents = isContentExist(getWifiMacName());
+                        if (Contents.size() != 0) {
+                            String ChannelID = "ChannelId_2";
+                            String ChannelName = "Memo";
+                            int Notification_id = 4;
+                            String Title = getWifiNickName(getWifiMacName()) + "에 등록된 메세지";
+                            String GroupName = "Content_Group";
+                            for (String str : Contents) {
+                                setGroupNotification(ChannelID, ChannelName, Notification_id++, Title, str, GroupName);
                             }
-                        } else if (!ForeGround.get().isBackGround() || !RestartCheck) {
-                            // TODO : 디비에 존재하지 않고, 백그라운드가 아닐 때 등록 다이얼로그
-                            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                            notificationManager.cancel(3);
-                            sendMessage(2, "Wifi", getWifiMacName(), getWifiName());
+                            setGroupSummaryNotification(ChannelID, ChannelName, 0, "일정 알림", Contents.size(), GroupName);
                         }
-                    } else if (isExist(getWifiName())) {
-                        if (ForeGround.get().isBackGround() || RestartCheck) {
-                            // TODO : 디비에 존재하고, 백그라운드일때 Contents 노티피 쌓기알림
-                            List<String> contents = isContentExist(getWifiName());
-                            if (contents.size() != 0) {
-                                int notify_count = 4;
-                                Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                PendingIntent pendingIntent = PendingIntent.getActivity(BluetoothWifiService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT); // 노티피 클릭시 이동할 수 있는 인텐트
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    String ChannelID = "Channel_3";
-                                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                                    NotificationChannel Noti = new NotificationChannel(ChannelID, "android", NotificationManager.IMPORTANCE_DEFAULT);
-                                    NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-                                    builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentTitle("WIFI 연결감지").setAutoCancel(true);
-                                    for (int i = 0; i < contents.size(); i++) {
-                                        builder.setContentText(contents.get(i));
-                                        builder.setGroup("Contents");
-                                        notificationManager.createNotificationChannel(Noti);
-                                        notificationManager.notify(notify_count++, builder.build());
-                                    }
-                                    Summary_Notify(contents);
-                                } else {
-                                    String ChannelID = "Channel_4";
-                                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                                    NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-                                    builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentTitle("WIFI 연결감지").setAutoCancel(true);
-                                    for (int i = 0; i < contents.size(); i++) {
-                                        builder.setContentText(contents.get(i));
-                                        builder.setGroup("Contents");
-                                        notificationManager.notify(notify_count++, builder.build());
-                                    }
-                                    Summary_Notify(contents);
-                                }
-                            }
-                        }
-                    } else if (isExist(getWifiName()) && (!ForeGround.get().isBackGround() || !RestartCheck)) {
-                        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                        notificationManager.cancel(0);
+                    } else if (!ForeGround.get().isBackGround()) {
+                        CancleNotification(0);
                     }
                 }
             }
 
             @Override
             public void onLost(Network network) {
-                if (!isExist(getWifiName()) && (ForeGround.get().isBackGround() || RestartCheck)) {
-                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.cancel(3);
-                }
+                isEnableWifi = false;
+                CancleNotification(0);
+                CancleNotification(3);
             }
         });
     }
 
-    public void Summary_Notify(List<String> contents) {
+    public void setNotification(String ChannelID, String Notifi_Channel_Name, int Notifi_id, String Title, String Content, String DeviceType, String Mac, String SSID) {
+        Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
+        intent.putExtra("DeviceType", DeviceType);
+        intent.putExtra("Mac", Mac);
+        intent.putExtra("SSID", SSID);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(BluetoothWifiService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT); // 노티피 클릭시 이동할 수 있는 인텐트
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel Noti = new NotificationChannel(ChannelID, Notifi_Channel_Name, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText(Content).setContentTitle(Title).setAutoCancel(true);
+            notificationManager.createNotificationChannel(Noti);
+            notificationManager.notify(Notifi_id, builder.build());
+        } else {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText(Content).setContentTitle(Title).setAutoCancel(true);
+            notificationManager.notify(Notifi_id, builder.build());
+        }
+    }
+
+    public void setGroupNotification(String ChannelID, String Notifi_Channel_Name, int Notifi_id, String Title, String Content, String GroupName) {
         Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(BluetoothWifiService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT); // 노티피 클릭시 이동할 수 있는 인텐트
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String ChannelID = "Channel_2";
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            NotificationChannel Noti = new NotificationChannel(ChannelID, "android", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel Noti = new NotificationChannel(ChannelID, Notifi_Channel_Name, NotificationManager.IMPORTANCE_DEFAULT);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentTitle("WIFI 연결감지").setAutoCancel(true);
-            builder.setNumber(contents.size());
-            builder.setGroup("Contents");
-            builder.setGroupSummary(true);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText(Content).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName);
             notificationManager.createNotificationChannel(Noti);
-            notificationManager.notify(0, builder.build());
+            notificationManager.notify(Notifi_id, builder.build());
+        } else {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText(Content).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName);
+            notificationManager.notify(Notifi_id, builder.build());
         }
     }
 
-    public void sendMessage(int resultCode, String DeviceType, String Mac, String SSID) {
-        Bundle bundle = new Bundle();
-        final ResultReceiver resultReceiver = mIntent.getParcelableExtra("RECEIVER");
-        bundle.putString("DeviceType", DeviceType);
-        bundle.putString("Mac", Mac);
-        bundle.putString("SSID", SSID);
-        resultReceiver.send(resultCode, bundle);
+    public void setGroupSummaryNotification(String ChannelID, String Notifi_Channel_Name, int Notifi_id, String Title, int size, String GroupName) {
+        Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(BluetoothWifiService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT); // 노티피 클릭시 이동할 수 있는 인텐트
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationChannel Noti = new NotificationChannel(ChannelID, Notifi_Channel_Name, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName).setGroupSummary(true).setNumber(size);
+            notificationManager.createNotificationChannel(Noti);
+            notificationManager.notify(Notifi_id, builder.build());
+        } else {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName).setGroupSummary(true).setNumber(size);
+            notificationManager.notify(Notifi_id, builder.build());
+        }
+    }
+
+    public void CancleNotification(int Notify_id) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(Notify_id);
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())){
-                sendMessage(1, "Bluetooth", device.getAddress(), device.getName());
+            if ("Activity_to_Service".equals(intent.getAction())) { // 어플 메인엑티비티 진입시 받는 리시버
+                if (isEnableWifi && !isExist(getWifiMacName())) {
+                    Log.e("Mac", getWifiMacName());
+                    Intent action = new Intent("Service_to_Activity");
+                    action.putExtra("DeviceType", "Wifi");
+                    action.putExtra("Mac", getWifiMacName());
+                    action.putExtra("SSID", getWifiName());
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(action);
+                }
+                CancleNotification(3);
+                CancleNotification(0);
+                Log.e("TAG : ", "Activity_to_Service");
+            }
+            try {
+                    Log.e("receiver : ", intent.getAction());
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
     };
@@ -242,16 +285,18 @@ public class BluetoothWifiService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.e("TAG : " , "onDestroy");
         setAlarmTimer();
-        unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-        registerReceiver(broadcastReceiver, intentFilter);
+        intentFilter.addAction("ReStartService");
+        intentFilter.addAction("Activity_to_Service");
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
     }
 
     @Override
@@ -280,6 +325,8 @@ public class BluetoothWifiService extends Service {
         super.onTaskRemoved(rootIntent);
 
         setAlarmTimer();
+        Log.e("TAG : " , "onTaskRemoved");
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
 

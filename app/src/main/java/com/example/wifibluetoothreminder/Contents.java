@@ -23,6 +23,8 @@ import android.widget.PopupMenu;
 import com.example.wifibluetoothreminder.CustomDialog.ContentDialog;
 import com.example.wifibluetoothreminder.Adapter.ContentsModelAdapter;
 import com.example.wifibluetoothreminder.Room.ContentList;
+import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
+import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.ViewModel.ContentListViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -37,6 +39,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     private Toolbar toolbar;
     private ContentsModelAdapter contentsModelAdapter;
 
+    private ServiceRunningCheck serviceRunningCheck;
     private ContentListViewModel contentListViewModel;
 
 
@@ -67,6 +70,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
         item = new ArrayList<>();
 
+        serviceRunningCheck = new ServiceRunningCheck(this);
         recyclerView = findViewById(R.id.ContentList);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -94,8 +98,16 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         Intent intent = new Intent();
         intent.putExtra("Mac", Mac);
         intent.putExtra("SIZE", item.size());
-        setResult(200);
+        setResult(200, intent);
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
+            stopService(new Intent(Contents.this, BluetoothWifiService.class));
+        finish();
     }
 
     // 여기서

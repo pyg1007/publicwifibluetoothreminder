@@ -26,6 +26,6 @@ public interface WifiBluetoothListDao {
     @Query("UPDATE wb_table SET Count = :Count WHERE Mac = :Mac")
     void updateCount(String Mac, int Count);
 
-    @Query("Delete FROM wb_table WHERE SSID = :Mac")
+    @Query("Delete FROM wb_table WHERE Mac = :Mac")
     void delete(String Mac);
 }
