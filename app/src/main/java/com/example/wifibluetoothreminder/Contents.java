@@ -9,8 +9,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -89,6 +92,34 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(HomeKeyPress);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        registerReceiver(HomeKeyPress, intentFilter);
+    }
+
+    private BroadcastReceiver HomeKeyPress = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())){
+                if ("homekey".equals(intent.getStringExtra("reason"))){
+                    if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
+                        stopService(new Intent(Contents.this, BluetoothWifiService.class));
+                    finish();
+                }else if ("recentapps".equals(intent.getStringExtra("reason"))){
+                    Log.e("TAG : ", "homekeyLongClick");
+                }
+            }
+        }
+    };
+
     public void getData() {
         Intent intent = getIntent();
         Mac = intent.getStringExtra("Mac");
@@ -103,14 +134,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         intent.putExtra("SIZE", items.size());
         setResult(200, intent);
         super.onBackPressed();
-    }
-
-    @Override
-    protected void onUserLeaveHint() {
-        super.onUserLeaveHint();
-        if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
-            stopService(new Intent(Contents.this, BluetoothWifiService.class));
-        finish();
     }
 
     @Override

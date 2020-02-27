@@ -100,13 +100,26 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         RecyclerViewlist_init();
     }
 
-//
-    
+    private BroadcastReceiver HomeKeyPress = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())){
+                if ("homekey".equals(intent.getStringExtra("reason"))){
+                    if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
+                        stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
+                    finish();
+                }else if ("recentapps".equals(intent.getStringExtra("reason"))){
+                    Log.e("TAG : ", "homekeyLongClick");
+                }
+            }
+        }
+    };
 
     @Override
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(HomeKeyPress);
     }
 
     @Override
@@ -114,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         super.onResume();
         IntentFilter intentFilter = new IntentFilter("Service_to_Activity");
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+        IntentFilter filter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        registerReceiver(HomeKeyPress, filter);
     }
 
 
