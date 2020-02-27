@@ -41,6 +41,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     private RecyclerView recyclerView;
     private Toolbar toolbar;
     private ContentsModelAdapter contentsModelAdapter;
+    private int Clickcount = 0;
 
     private ServiceRunningCheck serviceRunningCheck;
     private ContentListViewModel contentListViewModel;
@@ -202,22 +203,36 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 dialog.show();
                 return true;
             case R.id.Select:
-                item.setIcon(R.drawable.ic_delete_24dp);
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage(contentsModelAdapter.getCheckedlist().size() +"개의 일정을 삭제 하시겠습니까?");
-                builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        item.setIcon(R.drawable.ic_check_24dp);
-                    }
-                });
-                builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        item.setIcon(R.drawable.ic_check_24dp);
-                    }
-                });
-                builder.show();
+                Clickcount++;
+                if (Clickcount % 2 == 1){
+                    item.setIcon(R.drawable.ic_delete_24dp);
+                    contentsModelAdapter.setCount(Clickcount);
+                    contentsModelAdapter.notifyDataSetChanged();
+                }else{
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(contentsModelAdapter.getCheckedlist().size() +"개의 일정을 삭제 하시겠습니까?");
+                    builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            contentsModelAdapter.setCount(Clickcount);
+                            List<ContentList> list = contentsModelAdapter.getCheckedlist();
+                            for (int j = 0; j< list.size(); j++){
+                                contentListViewModel.Delete(list.get(j).ID, list.get(j).getContent());
+                            }
+                            item.setIcon(R.drawable.ic_check_24dp);
+                            contentsModelAdapter.notifyDataSetChanged();
+                        }
+                    });
+                    builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            contentsModelAdapter.setCount(Clickcount);
+                            item.setIcon(R.drawable.ic_check_24dp);
+                            contentsModelAdapter.notifyDataSetChanged();
+                        }
+                    });
+                    builder.show();
+                }
                 return true;
             case android.R.id.home:
                 Intent intent = new Intent();

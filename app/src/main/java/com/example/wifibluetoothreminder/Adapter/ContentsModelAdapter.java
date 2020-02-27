@@ -20,7 +20,10 @@ import java.util.List;
 public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdapter.CustomViewHoler> {
 
     private List<ContentList> list;
-    private List<ContentList> checkedlist = new ArrayList<>();
+    private List<ContentList> checkedlist;
+
+    private int count;
+
     private ContentsModelAdapter.OnListItemClickInterface mClickListener;
     private ContentsModelAdapter.OnListItemLongClickInterface mLongClickListener;
 
@@ -82,20 +85,34 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
     @Override
     public void onBindViewHolder(@NonNull ContentsModelAdapter.CustomViewHoler holder, final int position) {
         holder.ContentView.setText(list.get(position).getContent());
-        holder.checkBox.setChecked(false);
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b)
-                    checkedlist.add(list.get(position));
-                else
-                    checkedlist.remove(list.get(position));
-            }
-        });
+        checkedlist = new ArrayList<>();
+        if (getCount() % 2 == 0)
+            holder.checkBox.setVisibility(View.GONE);
+        else if (getCount() % 2 == 1) {
+            holder.checkBox.setVisibility(View.VISIBLE);
+            holder.checkBox.setChecked(false);
+            holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if (b)
+                        checkedlist.add(list.get(position));
+                    else
+                        checkedlist.remove(list.get(position));
+                }
+            });
+        }
     }
 
     public List<ContentList> getCheckedlist(){
         return checkedlist;
+    }
+
+    public void setCount(int Count){
+        count = Count;
+    }
+
+    public int getCount(){
+        return count;
     }
 
     @Override

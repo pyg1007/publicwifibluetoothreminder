@@ -155,7 +155,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         Bundle extra = getIntent().getExtras();
         if (extra != null) {
             try {
-                setFirstDetectDialog(extra.getString("DeviceType"), extra.getString("Mac"), extra.getString("SSID"));
+                if (extra.getString("DeviceType") != null && extra.getString("Mac") != null && extra.getString("SSID") != null)
+                    setFirstDetectDialog(extra.getString("DeviceType"), extra.getString("Mac"), extra.getString("SSID"));
             } catch (NullPointerException e) {
 
             }
