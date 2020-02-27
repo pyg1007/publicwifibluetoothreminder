@@ -17,7 +17,7 @@ import com.example.wifibluetoothreminder.Room.ContentList;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdapter.CustomViewHoler> {
+public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdapter.CustomViewHolder> {
 
     private List<ContentList> list;
     private List<ContentList> checkedlist;
@@ -41,12 +41,12 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
         void onItemClick(View v, int position);
     }
 
-    public class CustomViewHoler extends RecyclerView.ViewHolder {
+    public class CustomViewHolder extends RecyclerView.ViewHolder {
 
         public TextView ContentView;
         public CheckBox checkBox;
 
-        public CustomViewHoler(@NonNull View itemView) {
+        public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
 
             ContentView = itemView.findViewById(R.id.contents);
@@ -73,17 +73,17 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
 
     @NonNull
     @Override
-    public ContentsModelAdapter.CustomViewHoler onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ContentsModelAdapter.CustomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
 
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.contentslistitem, parent, false);
-        CustomViewHoler customViewHoler = new CustomViewHoler(view);
-        return customViewHoler;
+        CustomViewHolder customViewHolder = new CustomViewHolder(view);
+        return customViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ContentsModelAdapter.CustomViewHoler holder, final int position) {
+    public void onBindViewHolder(@NonNull ContentsModelAdapter.CustomViewHolder holder, final int position) {
         holder.ContentView.setText(list.get(position).getContent());
         checkedlist = new ArrayList<>();
         if (getCount() % 2 == 0)

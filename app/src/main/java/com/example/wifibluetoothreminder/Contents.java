@@ -175,7 +175,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
     @Override
     public void onItemClick(View v, int position) {
-        ContentsModelAdapter.CustomViewHoler customViewHoler = (ContentsModelAdapter.CustomViewHoler) recyclerView.findViewHolderForAdapterPosition(position);
+        ContentsModelAdapter.CustomViewHolder customViewHoler = (ContentsModelAdapter.CustomViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
     }
 
     @Override
@@ -209,29 +209,35 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                     contentsModelAdapter.setCount(Clickcount);
                     contentsModelAdapter.notifyDataSetChanged();
                 }else{
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setMessage(contentsModelAdapter.getCheckedlist().size() +"개의 일정을 삭제 하시겠습니까?");
-                    builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            contentsModelAdapter.setCount(Clickcount);
-                            List<ContentList> list = contentsModelAdapter.getCheckedlist();
-                            for (int j = 0; j< list.size(); j++){
-                                contentListViewModel.Delete(list.get(j).ID, list.get(j).getContent());
+                    if (contentsModelAdapter.getCheckedlist().size() != 0) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setMessage(contentsModelAdapter.getCheckedlist().size() + "개의 일정을 삭제 하시겠습니까?");
+                        builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                contentsModelAdapter.setCount(Clickcount);
+                                List<ContentList> list = contentsModelAdapter.getCheckedlist();
+                                for (int j = 0; j < list.size(); j++) {
+                                    contentListViewModel.Delete(list.get(j).ID, list.get(j).getContent());
+                                }
+                                item.setIcon(R.drawable.ic_check_24dp);
+                                contentsModelAdapter.notifyDataSetChanged();
                             }
-                            item.setIcon(R.drawable.ic_check_24dp);
-                            contentsModelAdapter.notifyDataSetChanged();
-                        }
-                    });
-                    builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            contentsModelAdapter.setCount(Clickcount);
-                            item.setIcon(R.drawable.ic_check_24dp);
-                            contentsModelAdapter.notifyDataSetChanged();
-                        }
-                    });
-                    builder.show();
+                        });
+                        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                contentsModelAdapter.setCount(Clickcount);
+                                item.setIcon(R.drawable.ic_check_24dp);
+                                contentsModelAdapter.notifyDataSetChanged();
+                            }
+                        });
+                        builder.show();
+                    }else{
+                        contentsModelAdapter.setCount(Clickcount);
+                        item.setIcon(R.drawable.ic_check_24dp);
+                        contentsModelAdapter.notifyDataSetChanged();
+                    }
                 }
                 return true;
             case android.R.id.home:
