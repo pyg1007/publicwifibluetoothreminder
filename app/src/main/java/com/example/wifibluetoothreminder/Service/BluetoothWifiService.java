@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -282,12 +283,26 @@ public class BluetoothWifiService extends Service {
         }
     };
 
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())){ // 연결될 때 감지
+                Log.e("Mac : " , device.getAddress());
+                Log.e("Name : ", device.getName());
+            }else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(intent.getAction())){ // 연결 끊길때 감지
+                Log.e("ACTION_ACL_DISCONNECTED", "DISCONNECTED");
+            }
+        }
+    };
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.e("TAG : " , "onDestroy");
         setAlarmTimer();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -297,6 +312,11 @@ public class BluetoothWifiService extends Service {
         intentFilter.addAction("ReStartService");
         intentFilter.addAction("Activity_to_Service");
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        registerReceiver(mBroadcastReceiver, filter);
     }
 
     @Override
@@ -327,6 +347,7 @@ public class BluetoothWifiService extends Service {
         setAlarmTimer();
         Log.e("TAG : " , "onTaskRemoved");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(mBroadcastReceiver);
     }
 
 
