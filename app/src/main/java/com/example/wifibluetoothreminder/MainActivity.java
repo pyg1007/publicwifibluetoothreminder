@@ -100,13 +100,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         RecyclerViewlist_init();
     }
 
-    @Override
-    protected void onUserLeaveHint() { // Home키 관련
-        super.onUserLeaveHint();
-        if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
-            stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
-        finish();
-    }
+//
+    
 
     @Override
     protected void onPause() {
