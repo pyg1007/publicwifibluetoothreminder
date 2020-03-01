@@ -1,18 +1,5 @@
 package com.example.wifibluetoothreminder;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -28,7 +15,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
-import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -41,8 +27,21 @@ import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.wifibluetoothreminder.CustomDialog.NickNameDialog;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.wifibluetoothreminder.Adapter.MainRecyclerViewAdapter;
+import com.example.wifibluetoothreminder.CustomDialog.NickNameDialog;
 import com.example.wifibluetoothreminder.Room.ContentList;
 import com.example.wifibluetoothreminder.Room.ContentListDao;
 import com.example.wifibluetoothreminder.Room.ListDatabase;
@@ -155,10 +154,14 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         Bundle extra = getIntent().getExtras();
         if (extra != null) {
             try {
+                Log.e("ForeGround : ", "ForeGround");
+                Log.e("DeviceType : ", extra.getString("DeviceType"));
+                Log.e("Mac : ", extra.getString("Mac"));
+                Log.e("SSID : ", extra.getString("SSID"));
                 if (extra.getString("DeviceType") != null && extra.getString("Mac") != null && extra.getString("SSID") != null)
                     setFirstDetectDialog(extra.getString("DeviceType"), extra.getString("Mac"), extra.getString("SSID"));
             } catch (NullPointerException e) {
-
+                e.printStackTrace();
             }
         }
     }
@@ -280,6 +283,10 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                     String DeviceType = intent.getStringExtra("DeviceType");
                     String Mac = intent.getStringExtra("Mac");
                     String SSID = intent.getStringExtra("SSID");
+                    Log.e("ForeGround : ", "ForeGround");
+                    Log.e("DeviceType : ", DeviceType);
+                    Log.e("Mac : ", Mac);
+                    Log.e("SSID : ", SSID);
                     if (DeviceType != null && Mac != null && SSID != null)
                         setFirstDetectDialog(DeviceType, Mac, SSID);
                 }catch (Exception e){
@@ -398,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 for (int i = 0; i < list.size(); i++) {
                     ssid_List.add(list.get(i).getNickName());
                 }
-
+                Log.e("index : ", String.valueOf(ssid_List.indexOf("fdd")));
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, ssid_List);
                 spinner.setAdapter(arrayAdapter);
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
