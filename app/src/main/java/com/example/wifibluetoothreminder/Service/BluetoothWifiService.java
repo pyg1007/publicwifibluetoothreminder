@@ -353,49 +353,53 @@ public class BluetoothWifiService extends Service {
     };
 
     public void BluetoothCheck(){ // 페어링되어있는 목록
-        Set<BluetoothDevice> bluetoothDevices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
-        for (BluetoothDevice bluetoothDevice : bluetoothDevices){
-            if (isConnected(bluetoothDevice)){
-                isEnableBluetooth = true;
-                BluetoothMacAddress = bluetoothDevice.getAddress();
-                BluetoothSSID = bluetoothDevice.getName();
-                if (!isExist(bluetoothDevice.getAddress())) {
-                    if (!ForeGround.get().isBackGround()) {
-                        Intent action = new Intent("Service_to_Activity");
-                        action.putExtra("DeviceType", "Bluetooth");
-                        action.putExtra("Mac", bluetoothDevice.getAddress());
-                        action.putExtra("SSID", bluetoothDevice.getName());
-                        LocalBroadcastManager.getInstance(BluetoothWifiService.this).sendBroadcast(action);
-                        CancleNotification(200);
-                    }else{
-                        String ChannelID = "ChannelID_3";
-                        String ChannelName = "Bluetooth";
-                        int Notification_id = 200;
-                        String Title = "Bluetooth 연결 감지";
-                        String Content = "Bluetooth 연결 감지, 연결하시겠습니까?";
-                        String DeviceType = "Bluetooth";
-                        setNotification(ChannelID, ChannelName, Notification_id, 1,Title, Content, DeviceType, bluetoothDevice.getAddress(), bluetoothDevice.getName());
-                    }
-                }else{
-                    if (ForeGround.get().isBackGround()){
-                        List<String> Contents = isContentExist(bluetoothDevice.getAddress());
-                        if (Contents.size() != 0) {
-                            String ChannelID = "ChannelId_3";
+        try {
+            Set<BluetoothDevice> bluetoothDevices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
+            for (BluetoothDevice bluetoothDevice : bluetoothDevices) {
+                if (isConnected(bluetoothDevice)) {
+                    isEnableBluetooth = true;
+                    BluetoothMacAddress = bluetoothDevice.getAddress();
+                    BluetoothSSID = bluetoothDevice.getName();
+                    if (!isExist(bluetoothDevice.getAddress())) {
+                        if (!ForeGround.get().isBackGround()) {
+                            Intent action = new Intent("Service_to_Activity");
+                            action.putExtra("DeviceType", "Bluetooth");
+                            action.putExtra("Mac", bluetoothDevice.getAddress());
+                            action.putExtra("SSID", bluetoothDevice.getName());
+                            LocalBroadcastManager.getInstance(BluetoothWifiService.this).sendBroadcast(action);
+                            CancleNotification(200);
+                        } else {
+                            String ChannelID = "ChannelID_3";
                             String ChannelName = "Bluetooth";
-                            int Notification_id = 201;
-                            String Title = getNickName(bluetoothDevice.getAddress()) + "에 등록된 메세지";
-                            String GroupName = "Content_Group";
-                            for (String str : Contents) {
-                                setGroupNotification(ChannelID, ChannelName, Notification_id++, 3,Title, str, GroupName);
-                            }
-                            setGroupSummaryNotification(ChannelID, ChannelName, 0, 4,"일정 알림", Contents.size(), GroupName);
+                            int Notification_id = 200;
+                            String Title = "Bluetooth 연결 감지";
+                            String Content = "Bluetooth 연결 감지, 연결하시겠습니까?";
+                            String DeviceType = "Bluetooth";
+                            setNotification(ChannelID, ChannelName, Notification_id, 1, Title, Content, DeviceType, bluetoothDevice.getAddress(), bluetoothDevice.getName());
                         }
-                    }else{
-                        CancleNotification(0);
+                    } else {
+                        if (ForeGround.get().isBackGround()) {
+                            List<String> Contents = isContentExist(bluetoothDevice.getAddress());
+                            if (Contents.size() != 0) {
+                                String ChannelID = "ChannelId_3";
+                                String ChannelName = "Bluetooth";
+                                int Notification_id = 201;
+                                String Title = getNickName(bluetoothDevice.getAddress()) + "에 등록된 메세지";
+                                String GroupName = "Content_Group";
+                                for (String str : Contents) {
+                                    setGroupNotification(ChannelID, ChannelName, Notification_id++, 3, Title, str, GroupName);
+                                }
+                                setGroupSummaryNotification(ChannelID, ChannelName, 0, 4, "일정 알림", Contents.size(), GroupName);
+                            }
+                        } else {
+                            CancleNotification(0);
+                        }
                     }
+                    break;
                 }
-                break;
             }
+        }catch (Exception e){ // 블루투스가 꺼져있는경우 or 사용못하는 기기인경우
+            e.printStackTrace();
         }
     }
 
