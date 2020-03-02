@@ -49,6 +49,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             NickName = view.findViewById(R.id.NickName);
             ContentsCount = view.findViewById(R.id.ContentCount);
             DeviceName = view.findViewById(R.id.devicename);
+            DeviceName.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
