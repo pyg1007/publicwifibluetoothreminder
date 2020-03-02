@@ -50,6 +50,7 @@ public class RestartService extends Service {
 
         /////////////////////////////////////////////////////////////////////
         Intent in = new Intent(this, BluetoothWifiService.class);
+        in.putExtra("ReStarted", true);
         startService(in);
 
 

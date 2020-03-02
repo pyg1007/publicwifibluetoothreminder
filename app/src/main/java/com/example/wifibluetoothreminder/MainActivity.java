@@ -150,20 +150,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         toolbar.setBackgroundColor(Color.BLACK);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
-
-        Bundle extra = getIntent().getExtras();
-        if (extra != null) {
-            try {
-                Log.e("ForeGround : ", "ForeGround");
-                Log.e("DeviceType : ", extra.getString("DeviceType"));
-                Log.e("Mac : ", extra.getString("Mac"));
-                Log.e("SSID : ", extra.getString("SSID"));
-                if (extra.getString("DeviceType") != null && extra.getString("Mac") != null && extra.getString("SSID") != null)
-                    setFirstDetectDialog(extra.getString("DeviceType"), extra.getString("Mac"), extra.getString("SSID"));
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public void RecyclerViewlist_init() {

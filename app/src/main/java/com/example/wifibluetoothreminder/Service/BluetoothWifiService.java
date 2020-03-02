@@ -44,6 +44,7 @@ public class BluetoothWifiService extends Service {
 
     private boolean isEnableWifi = false;
     private boolean isEnableBluetooth = false;
+    private boolean isRestarted = false;
 
     private String BluetoothMacAddress;
     private String BluetoothSSID;
@@ -52,6 +53,8 @@ public class BluetoothWifiService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        isRestarted = intent.getBooleanExtra("ReStarted", false);
 
         WifiStatus();
 
@@ -166,15 +169,14 @@ public class BluetoothWifiService extends Service {
             public void onAvailable(Network network) {
                 isEnableWifi = true;
                 if (!isExist(getWifiMacName())) {
-                    if (ForeGround.get().isBackGround()) {
+                    if (ForeGround.get().isBackGround() || isRestarted) {
                         String ChannelID = "ChannelID_1";
                         String ChannelName = "Wifi";
                         int Notification_id = 100;
                         String Title = "Wifi 연결 감지";
                         String Content = "Wifi 연결 감지, 연결하시겠습니까?";
-                        String DeviceType = "Wifi";
-                        setNotification(ChannelID, ChannelName, Notification_id, 0 ,Title, Content, DeviceType, getWifiMacName(), getWifiName());
-                    } else if (!ForeGround.get().isBackGround()) {
+                        setNotification(ChannelID, ChannelName, Notification_id, 0 ,Title, Content);
+                    } else if (!ForeGround.get().isBackGround() || !isRestarted) {
                         int Notification_id = 100;
                         Intent action = new Intent("Service_to_Activity");
                         action.putExtra("DeviceType", "Wifi");
@@ -184,7 +186,7 @@ public class BluetoothWifiService extends Service {
                         CancleNotification(Notification_id);
                     }
                 } else {
-                    if (ForeGround.get().isBackGround()) {
+                    if (ForeGround.get().isBackGround() || isRestarted) {
                         List<String> Contents = isContentExist(getWifiMacName());
                         if (Contents.size() != 0) {
                             String ChannelID = "ChannelId_2";
@@ -197,7 +199,7 @@ public class BluetoothWifiService extends Service {
                             }
                             setGroupSummaryNotification(ChannelID, ChannelName, 0,2, "일정 알림", Contents.size(), GroupName);
                         }
-                    } else if (!ForeGround.get().isBackGround()) {
+                    } else if (!ForeGround.get().isBackGround() || !isRestarted) {
                         CancleNotification(0);
                     }
                 }
@@ -212,11 +214,8 @@ public class BluetoothWifiService extends Service {
         });
     }
 
-    public void setNotification(String ChannelID, String Notifi_Channel_Name, int Notifi_id, int RequestCode, String Title, String Content, String DeviceType, String Mac, String SSID) {
+    public void setNotification(String ChannelID, String Notifi_Channel_Name, int Notifi_id, int RequestCode, String Title, String Content) {
         Intent intent = new Intent(BluetoothWifiService.this, MainActivity.class);
-        intent.putExtra("DeviceType", DeviceType);
-        intent.putExtra("Mac", Mac);
-        intent.putExtra("SSID", SSID);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(BluetoothWifiService.this, RequestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT); // 노티피 클릭시 이동할 수 있는 인텐트
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -281,6 +280,7 @@ public class BluetoothWifiService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ("Activity_to_Service".equals(intent.getAction())) { // 어플 메인엑티비티 진입시 받는 리시버
+                isRestarted = false;
                 if (isEnableWifi && !isExist(getWifiMacName())) {
                     Log.e("Mac", getWifiMacName());
                     Intent action = new Intent("Service_to_Activity");
@@ -309,24 +309,23 @@ public class BluetoothWifiService extends Service {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())){ // 연결될 때 감지
                 if (!isExist(device.getAddress())) {
-                    if (!ForeGround.get().isBackGround()) {
+                    if (!ForeGround.get().isBackGround() || !isRestarted) {
                         Intent action = new Intent("Service_to_Activity");
                         action.putExtra("DeviceType", "Bluetooth");
                         action.putExtra("Mac", device.getAddress());
                         action.putExtra("SSID", device.getName());
                         LocalBroadcastManager.getInstance(context).sendBroadcast(action);
                         CancleNotification(200);
-                    }else{
+                    }else if (ForeGround.get().isBackGround() || isRestarted){
                         String ChannelID = "ChannelID_3";
                         String ChannelName = "Bluetooth";
                         int Notification_id = 200;
                         String Title = "Bluetooth 연결 감지";
                         String Content = "Bluetooth 연결 감지, 연결하시겠습니까?";
-                        String DeviceType = "Bluetooth";
-                        setNotification(ChannelID, ChannelName, Notification_id, 1,Title, Content, DeviceType, device.getAddress(), device.getName());
+                        setNotification(ChannelID, ChannelName, Notification_id, 1,Title, Content);
                     }
                 }else{
-                    if (ForeGround.get().isBackGround()){
+                    if (ForeGround.get().isBackGround() || isRestarted){
                         List<String> Contents = isContentExist(device.getAddress());
                         if (Contents.size() != 0) {
                             String ChannelID = "ChannelId_3";
@@ -339,7 +338,7 @@ public class BluetoothWifiService extends Service {
                             }
                             setGroupSummaryNotification(ChannelID, ChannelName, 0, 4,"일정 알림", Contents.size(), GroupName);
                         }
-                    }else{
+                    }else if (!ForeGround.get().isBackGround() || !isRestarted){
                         CancleNotification(0);
                     }
                 }
@@ -374,8 +373,7 @@ public class BluetoothWifiService extends Service {
                             int Notification_id = 200;
                             String Title = "Bluetooth 연결 감지";
                             String Content = "Bluetooth 연결 감지, 연결하시겠습니까?";
-                            String DeviceType = "Bluetooth";
-                            setNotification(ChannelID, ChannelName, Notification_id, 1, Title, Content, DeviceType, bluetoothDevice.getAddress(), bluetoothDevice.getName());
+                            setNotification(ChannelID, ChannelName, Notification_id, 1, Title, Content);
                         }
                     } else {
                         if (ForeGround.get().isBackGround()) {
