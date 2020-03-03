@@ -20,6 +20,7 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -170,6 +171,7 @@ public class BluetoothWifiService extends Service {
                 isEnableWifi = true;
                 if (!isExist(getWifiMacName())) {
                     if (ForeGround.get().isBackGround() || isRestarted) {
+                        Toast.makeText(BluetoothWifiService.this, String.valueOf(ForeGround.get().isBackGround()) + isRestarted, Toast.LENGTH_SHORT).show();
                         String ChannelID = "ChannelID_1";
                         String ChannelName = "Wifi";
                         int Notification_id = 100;
@@ -464,6 +466,4 @@ public class BluetoothWifiService extends Service {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         unregisterReceiver(mBroadcastReceiver);
     }
-
-
 }

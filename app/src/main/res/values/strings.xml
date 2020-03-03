@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Wifi/bluetooth Reminder</string>
+    <string name="admob_app_id">ca-app-pub-5862740550747862~5624356768</string>
+    <string name="admob_banner_unit_id">ca-app-pub-5862740550747862/4858070007</string>
 </resources>

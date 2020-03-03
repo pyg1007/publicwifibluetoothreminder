@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -52,12 +53,18 @@ import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.ViewModel.ContentListViewModel;
 import com.example.wifibluetoothreminder.ViewModel.WifiBluetoothListViewModel;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MainRecyclerViewAdapter.OnListItemLongClickInterface, MainRecyclerViewAdapter.OnListItemClickInterface {
 
+    // google Admob관련
+    private AdView adView;
 
     // 변경되지 않을 상수
     private static final int REQUEST_ACCESS_LOCATION = 1000;
@@ -66,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public RecyclerView recyclerView;
     public MainRecyclerViewAdapter mainRecyclerViewAdapter;
     private Toolbar toolbar;
+    private TextView MainText;
 
     private WifiBluetoothListViewModel wifiBluetoothListViewModel;
     private ContentListViewModel contentListViewModel;
@@ -89,10 +97,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             public void onChanged(List<WifiBluetoothList> wifiBluetoothLists) {
                 list.clear();
                 if (wifiBluetoothLists.size() != 0) {
+                    MainText.setVisibility(View.GONE);
                     list.addAll(wifiBluetoothLists);
                 }
-                for ( int i = 0; i < list.size(); i++)
-                    Log.e("list : " , list.get(i).getMac() + list.get(i).getNickName());
+                else
+                    MainText.setVisibility(View.VISIBLE);
                 mainRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
@@ -150,9 +159,57 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
         toolbar = findViewById(R.id.MainToolbar);
         toolbar.setTitle("와이파이/블루투스 리마인더");
-        toolbar.setBackgroundColor(Color.BLACK);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
+
+        MainText = findViewById(R.id.Center_Text);
+
+        MobileAds.initialize(this, getString(R.string.admob_app_id));
+        adView = findViewById(R.id.Main_AdMob);
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+        AdmobTest();
+    }
+
+    public void AdmobTest(){
+        adView.setAdListener(new AdListener(){
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                Log.e("onAdClosed", "onAdClosed");
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+                super.onAdFailedToLoad(i);
+                Log.e("onAdFailedToLoad", "onAdFailedToLoad"+i);
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                super.onAdLeftApplication();
+                Log.e("onAdLeftApplication", "onAdLeftApplication");
+            }
+
+            @Override
+            public void onAdOpened() {
+                super.onAdOpened();
+                Log.e("onAdOpened", "onAdOpened");
+            }
+
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                Log.e("onAdLoaded", "onAdLoaded");
+            }
+
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+                Log.e("onAdClicked", "onAdClicked");
+            }
+        });
     }
 
     public void RecyclerViewlist_init() {
@@ -388,46 +445,52 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.Add:
-                dialogView = (View) View.inflate(MainActivity.this, R.layout.menudialog, null);
-                Spinner spinner = dialogView.findViewById(R.id.spinner);
                 ArrayList<String> ssid_List = new ArrayList<>();
                 for (int i = 0; i < list.size(); i++) {
                     ssid_List.add(list.get(i).getNickName());
                 }
-                Log.e("index : ", String.valueOf(ssid_List.indexOf("fdd")));
-                ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, ssid_List);
-                spinner.setAdapter(arrayAdapter);
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        SpinierPosition = i;
-                    }
+                if (ssid_List.size() != 0) {
+                    dialogView = (View) View.inflate(MainActivity.this, R.layout.menudialog, null);
+                    Spinner spinner = dialogView.findViewById(R.id.spinner);
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
+                    Log.e("index : ", String.valueOf(ssid_List.indexOf("fdd")));
+                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, ssid_List);
+                    spinner.setAdapter(arrayAdapter);
+                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                            SpinierPosition = i;
+                        }
 
-                    }
-                });
-                final EditText editText = dialogView.findViewById(R.id.editText2);
-                AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
-                dlg.setTitle("일정 등록");
-                dlg.setView(dialogView);
-                dlg.setPositiveButton("확인", null);
-                dlg.setNegativeButton("취소", null);
-                final AlertDialog alertDialog = dlg.create();
-                alertDialog.show();
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (editText.getText().length() > 0) {
-                            contentListViewModel.Insert(new ContentList(list.get(SpinierPosition).getMac(), list.get(SpinierPosition).getSSID(), editText.getText().toString()));
-                            wifiBluetoothListViewModel.updateCount(list.get(SpinierPosition).getMac(), list.get(SpinierPosition).getCount() + 1);
-                            mainRecyclerViewAdapter.notifyDataSetChanged();
-                            alertDialog.dismiss();
-                        } else
-                            StartToast("일정 내용을 입력해주세요");
-                    }
-                });
+                        @Override
+                        public void onNothingSelected(AdapterView<?> adapterView) {
+
+                        }
+                    });
+                    final EditText editText = dialogView.findViewById(R.id.editText2);
+                    AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
+                    dlg.setTitle("일정 등록");
+                    dlg.setView(dialogView);
+                    dlg.setPositiveButton("확인", null);
+                    dlg.setNegativeButton("취소", null);
+                    final AlertDialog alertDialog = dlg.create();
+                    alertDialog.show();
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (editText.getText().length() > 0) {
+                                contentListViewModel.Insert(new ContentList(list.get(SpinierPosition).getMac(), list.get(SpinierPosition).getSSID(), editText.getText().toString()));
+                                wifiBluetoothListViewModel.updateCount(list.get(SpinierPosition).getMac(), list.get(SpinierPosition).getCount() + 1);
+                                mainRecyclerViewAdapter.notifyDataSetChanged();
+                                alertDialog.dismiss();
+                            } else
+                                StartToast("일정 내용을 입력해주세요");
+                        }
+                    });
+                }else{
+                    Intent intent = new Intent("Activity_to_Service");
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

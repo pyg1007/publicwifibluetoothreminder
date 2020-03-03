@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.wifibluetoothreminder.R;
 
@@ -57,8 +58,12 @@ public class ContentDialog extends Dialog implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.Confirm:
-                customDialogListener.PositiveClick(Content.getText().toString());
-                dismiss();
+                if (Content.getText().toString().length() > 0) {
+                    customDialogListener.PositiveClick(Content.getText().toString());
+                    dismiss();
+                }else{
+                    Toast.makeText(context, "일정을 입력해 주세요.", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.Cancle:
                 customDialogListener.NegativeClick();

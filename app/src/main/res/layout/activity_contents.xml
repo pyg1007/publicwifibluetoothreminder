@@ -4,18 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffff9e"
     android:orientation="vertical"
     tools:context=".Contents">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/ContentsToolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:background="#ff8c0a" />
+
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/Contents_AdMob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/admob_banner_unit_id" />
+
+    <TextView
+        android:id="@+id/Contents_Text"
+        android:text="일정이 등록되어있지 않습니다."
+        android:textSize="20sp"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ContentList"
-        android:clipToPadding="false"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:clipToPadding="false" />
 
 </LinearLayout>

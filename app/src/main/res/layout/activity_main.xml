@@ -5,12 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#ffff9e"
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/MainToolbar"
+        android:background="#ff8c0a"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/Main_AdMob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/admob_banner_unit_id"/>
+
+    <TextView
+        android:id="@+id/Center_Text"
+        android:text="등록된 기기가 없습니다."
+        android:textSize="20sp"
+        android:gravity="center_horizontal|center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/WIFINameList"

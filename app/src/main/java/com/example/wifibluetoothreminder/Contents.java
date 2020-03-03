@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,12 +31,20 @@ import com.example.wifibluetoothreminder.Room.ContentList;
 import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.example.wifibluetoothreminder.ViewModel.ContentListViewModel;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Contents extends AppCompatActivity implements ContentsModelAdapter.OnListItemClickInterface, ContentsModelAdapter.OnListItemLongClickInterface{
 
+    //google Admob관련
+    private AdView adView;
+
+    private TextView CenterText;
     private String Mac, SSID, NickName;
     private List<ContentList> items;
     private RecyclerView recyclerView;
@@ -64,6 +73,11 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         if (contentList.getMac().equals(Mac))
                             items.add(contentList);
                 }
+                if (items.size() != 0)
+                    CenterText.setVisibility(View.GONE);
+                else
+                    CenterText.setVisibility(View.VISIBLE);
+
                 contentsModelAdapter.notifyDataSetChanged();
             }
         });
@@ -87,12 +101,60 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
         toolbar = findViewById(R.id.ContentsToolbar);
         toolbar.setTitle(NickName + "의 일정");
-        toolbar.setBackgroundColor(Color.BLACK);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back_black_24dp);
+
+        CenterText = findViewById(R.id.Contents_Text);
+
+        MobileAds.initialize(this, getString(R.string.admob_app_id));
+        adView = findViewById(R.id.Contents_AdMob);
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+        AdmobTest();
+    }
+
+    public void AdmobTest(){
+        adView.setAdListener(new AdListener(){
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                Log.e("onAdClosed", "onAdClosed");
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+                super.onAdFailedToLoad(i);
+                Log.e("onAdFailedToLoad", "onAdFailedToLoad"+i);
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                super.onAdLeftApplication();
+                Log.e("onAdLeftApplication", "onAdLeftApplication");
+            }
+
+            @Override
+            public void onAdOpened() {
+                super.onAdOpened();
+                Log.e("onAdOpened", "onAdOpened");
+            }
+
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                Log.e("onAdLoaded", "onAdLoaded");
+            }
+
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+                Log.e("onAdClicked", "onAdClicked");
+            }
+        });
     }
 
     @Override
@@ -194,8 +256,10 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
                     @Override
                     public void PositiveClick(String Contents) {
-                        contentListViewModel.Insert(new ContentList(Mac, SSID, Contents));
-                        contentsModelAdapter.notifyDataSetChanged();
+                        if (Contents.length()>0) {
+                            contentListViewModel.Insert(new ContentList(Mac, SSID, Contents));
+                            contentsModelAdapter.notifyDataSetChanged();
+                        }
                     }
                     @Override
                     public void NegativeClick() {
