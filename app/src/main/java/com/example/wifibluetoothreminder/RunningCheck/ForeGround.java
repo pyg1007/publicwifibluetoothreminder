@@ -12,30 +12,30 @@ public class ForeGround implements Application.ActivityLifecycleCallbacks {
 
     private int running = 0;
 
-    private ForeGround(){
+    private ForeGround() {
 
     }
 
-    public static void init(Application app){
+    public static void init(Application app) {
         if (instance == null)
             instance = new ForeGround();
         app.registerActivityLifecycleCallbacks(instance);
     }
 
-    public static ForeGround get(){
+    public static ForeGround get() {
         return instance;
     }
 
 
-    public AppStatus getmAppStatus(){
+    public AppStatus getmAppStatus() {
         return mAppStatus;
     }
 
-    public boolean isBackGround(){
+    public boolean isBackGround() {
         return mAppStatus.ordinal() == mAppStatus.BACKGROUND.ordinal();
     }
 
-    public enum AppStatus{
+    public enum AppStatus {
         BACKGROUND, // app is background
         RETURNED_TO_FOREGROUND, // app returned to foreground(or first launch)
         FOREGROUND; // app is foreground
@@ -49,9 +49,9 @@ public class ForeGround implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStarted(Activity activity) {
-        if (++ running == 1)
+        if (++running == 1)
             mAppStatus = AppStatus.RETURNED_TO_FOREGROUND;
-        else if (running >1)
+        else if (running > 1)
             mAppStatus = AppStatus.FOREGROUND;
     }
 
@@ -66,7 +66,7 @@ public class ForeGround implements Application.ActivityLifecycleCallbacks {
 
     @Override
     public void onActivityStopped(Activity activity) {
-        if (-- running == 0)
+        if (--running == 0)
             mAppStatus = AppStatus.BACKGROUND;
     }
 

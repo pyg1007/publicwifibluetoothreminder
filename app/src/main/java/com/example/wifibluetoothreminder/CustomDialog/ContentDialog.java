@@ -17,7 +17,7 @@ import androidx.annotation.NonNull;
 
 import com.example.wifibluetoothreminder.R;
 
-public class ContentDialog extends Dialog implements View.OnClickListener{
+public class ContentDialog extends Dialog implements View.OnClickListener {
 
     private Context context;
 
@@ -26,7 +26,7 @@ public class ContentDialog extends Dialog implements View.OnClickListener{
     private Button PositiveButton;
     private Button NegativeButton;
 
-    public ContentDialog.CustomDialogListener customDialogListener;
+    public CustomDialogListener customDialogListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class ContentDialog extends Dialog implements View.OnClickListener{
         UI();
     }
 
-    public void UI(){
+    public void UI() {
         Content = findViewById(R.id.Content);
         textView = findViewById(R.id.Content_Dialog_Title);
         textView.setText("일정등록");
@@ -51,28 +51,29 @@ public class ContentDialog extends Dialog implements View.OnClickListener{
         NegativeButton.setOnClickListener(this);
     }
 
-    public interface CustomDialogListener{
+    public interface CustomDialogListener {
         void PositiveClick(String Contents);
+
         void NegativeClick();
     }
 
-    public void setDialogListener(ContentDialog.CustomDialogListener customDialogListener){
+    public void setDialogListener(ContentDialog.CustomDialogListener customDialogListener) {
         this.customDialogListener = customDialogListener;
     }
 
     public ContentDialog(@NonNull Context context) {
         super(context);
-        this.context= context;
+        this.context = context;
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.Enrollment:
                 if (Content.getText().toString().length() > 0) {
                     customDialogListener.PositiveClick(Content.getText().toString());
                     dismiss();
-                }else{
+                } else {
                     Toast.makeText(context, "일정을 입력해 주세요.", Toast.LENGTH_SHORT).show();
                 }
                 break;

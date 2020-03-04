@@ -107,7 +107,7 @@ public class BluetoothWifiService extends Service {
                 }
             }
         });
-       thread.start();
+        thread.start();
         try {
             thread.join();
         } catch (InterruptedException e) {
@@ -177,7 +177,7 @@ public class BluetoothWifiService extends Service {
                         int Notification_id = 100;
                         String Title = "Wifi 연결 감지";
                         String Content = "Wifi 연결 감지, 연결하시겠습니까?";
-                        setNotification(ChannelID, ChannelName, Notification_id, 0 ,Title, Content);
+                        setNotification(ChannelID, ChannelName, Notification_id, 0, Title, Content);
                     } else if (!ForeGround.get().isBackGround() || !isRestarted) {
                         int Notification_id = 100;
                         Intent action = new Intent("Service_to_Activity");
@@ -199,7 +199,7 @@ public class BluetoothWifiService extends Service {
                             for (String str : Contents) {
                                 setGroupNotification(ChannelID, ChannelName, Notification_id++, 1, Title, str, GroupName);
                             }
-                            setGroupSummaryNotification(ChannelID, ChannelName, 0,2, "일정 알림", Contents.size(), GroupName);
+                            setGroupSummaryNotification(ChannelID, ChannelName, 0, 2, "일정 알림", Contents.size(), GroupName);
                         }
                     } else if (!ForeGround.get().isBackGround() || !isRestarted) {
                         CancleNotification(0);
@@ -290,7 +290,7 @@ public class BluetoothWifiService extends Service {
                     action.putExtra("Mac", getWifiMacName());
                     action.putExtra("SSID", getWifiName());
                     LocalBroadcastManager.getInstance(context).sendBroadcast(action);
-                }else if (isEnableBluetooth && !isExist(BluetoothMacAddress) && BluetoothMacAddress != null){
+                } else if (isEnableBluetooth && !isExist(BluetoothMacAddress) && BluetoothMacAddress != null) {
                     Intent action = new Intent("Service_to_Activity");
                     action.putExtra("DeviceType", "Bluetooth");
                     action.putExtra("Mac", BluetoothMacAddress);
@@ -309,7 +309,7 @@ public class BluetoothWifiService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())){ // 연결될 때 감지
+            if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())) { // 연결될 때 감지
                 if (!isExist(device.getAddress())) {
                     if (!ForeGround.get().isBackGround() || !isRestarted) {
                         Intent action = new Intent("Service_to_Activity");
@@ -318,16 +318,16 @@ public class BluetoothWifiService extends Service {
                         action.putExtra("SSID", device.getName());
                         LocalBroadcastManager.getInstance(context).sendBroadcast(action);
                         CancleNotification(200);
-                    }else if (ForeGround.get().isBackGround() || isRestarted){
+                    } else if (ForeGround.get().isBackGround() || isRestarted) {
                         String ChannelID = "ChannelID_3";
                         String ChannelName = "Bluetooth";
                         int Notification_id = 200;
                         String Title = "Bluetooth 연결 감지";
                         String Content = "Bluetooth 연결 감지, 연결하시겠습니까?";
-                        setNotification(ChannelID, ChannelName, Notification_id, 1,Title, Content);
+                        setNotification(ChannelID, ChannelName, Notification_id, 1, Title, Content);
                     }
-                }else{
-                    if (ForeGround.get().isBackGround() || isRestarted){
+                } else {
+                    if (ForeGround.get().isBackGround() || isRestarted) {
                         List<String> Contents = isContentExist(device.getAddress());
                         if (Contents.size() != 0) {
                             String ChannelID = "ChannelId_3";
@@ -336,15 +336,15 @@ public class BluetoothWifiService extends Service {
                             String Title = getNickName(device.getAddress()) + "에 등록된 메세지";
                             String GroupName = "Content_Group";
                             for (String str : Contents) {
-                                setGroupNotification(ChannelID, ChannelName, Notification_id++, 3,Title, str, GroupName);
+                                setGroupNotification(ChannelID, ChannelName, Notification_id++, 3, Title, str, GroupName);
                             }
-                            setGroupSummaryNotification(ChannelID, ChannelName, 0, 4,"일정 알림", Contents.size(), GroupName);
+                            setGroupSummaryNotification(ChannelID, ChannelName, 0, 4, "일정 알림", Contents.size(), GroupName);
                         }
-                    }else if (!ForeGround.get().isBackGround() || !isRestarted){
+                    } else if (!ForeGround.get().isBackGround() || !isRestarted) {
                         CancleNotification(0);
                     }
                 }
-            }else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(intent.getAction())){ // 연결 끊길때 감지
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(intent.getAction())) { // 연결 끊길때 감지
                 Log.e("ACTION_ACL_DISCONNECTED", "DISCONNECTED");
                 isEnableBluetooth = false;
                 CancleNotification(200);
@@ -353,7 +353,7 @@ public class BluetoothWifiService extends Service {
         }
     };
 
-    public void BluetoothCheck(){ // 페어링되어있는 목록
+    public void BluetoothCheck() { // 페어링되어있는 목록
         try {
             Set<BluetoothDevice> bluetoothDevices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
             for (BluetoothDevice bluetoothDevice : bluetoothDevices) {
@@ -398,17 +398,17 @@ public class BluetoothWifiService extends Service {
                     break;
                 }
             }
-        }catch (Exception e){ // 블루투스가 꺼져있는경우 or 사용못하는 기기인경우
+        } catch (Exception e) { // 블루투스가 꺼져있는경우 or 사용못하는 기기인경우
             e.printStackTrace();
         }
     }
 
-    public boolean isConnected(BluetoothDevice device){
-        try{
+    public boolean isConnected(BluetoothDevice device) {
+        try {
             Method m = device.getClass().getMethod("isConnected", (Class[]) null);
             boolean connected = (boolean) m.invoke(device, (Object[]) null);
             return connected;
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
@@ -416,7 +416,7 @@ public class BluetoothWifiService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e("TAG : " , "onDestroy");
+        Log.e("TAG : ", "onDestroy");
         setAlarmTimer();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         unregisterReceiver(mBroadcastReceiver);
@@ -462,7 +462,7 @@ public class BluetoothWifiService extends Service {
         super.onTaskRemoved(rootIntent);
 
         setAlarmTimer();
-        Log.e("TAG : " , "onTaskRemoved");
+        Log.e("TAG : ", "onTaskRemoved");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         unregisterReceiver(mBroadcastReceiver);
     }

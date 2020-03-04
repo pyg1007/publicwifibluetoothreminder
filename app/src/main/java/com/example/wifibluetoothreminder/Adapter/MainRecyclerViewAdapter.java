@@ -22,28 +22,28 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     private OnListItemClickInterface mClickListener;
     private OnListItemLongClickInterface mLongClickListener;
 
-    public MainRecyclerViewAdapter(List<WifiBluetoothList> item, OnListItemLongClickInterface LongClickListener, OnListItemClickInterface ClickListener){
+    public MainRecyclerViewAdapter(List<WifiBluetoothList> item, OnListItemLongClickInterface LongClickListener, OnListItemClickInterface ClickListener) {
         this.itemList = item;
         this.mClickListener = ClickListener;
         this.mLongClickListener = LongClickListener;
     }
 
-    public interface OnListItemLongClickInterface{
+    public interface OnListItemLongClickInterface {
         void onItemLongClick(View v, int position);
     }
 
-    public interface OnListItemClickInterface{
+    public interface OnListItemClickInterface {
         void onItemClick(View v, int position);
     }
 
 
-    public class CoustomViewHolder extends RecyclerView.ViewHolder{
+    public class CoustomViewHolder extends RecyclerView.ViewHolder {
 
         public TextView NickName;
         public TextView ContentsCount;
         public ImageView DeviceName;
 
-        public CoustomViewHolder(View view){
+        public CoustomViewHolder(View view) {
             super(view);
 
             NickName = view.findViewById(R.id.NickName);
@@ -72,9 +72,6 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             });
         }
     }
-
-
-
 
 
     @NonNull

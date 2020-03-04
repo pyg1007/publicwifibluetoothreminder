@@ -38,6 +38,7 @@ public class Main_Content_Enrollment_Dialog extends Dialog implements View.OnCli
 
     public interface CustomDialogListener {
         void PositiveClick(String Content, int position);
+
         void NegativeClick();
     }
 
@@ -60,7 +61,7 @@ public class Main_Content_Enrollment_Dialog extends Dialog implements View.OnCli
         UI();
     }
 
-    public void UI(){
+    public void UI() {
         NickName_Text = findViewById(R.id.NickName_Text);
         Title = findViewById(R.id.Title);
         Title.setTextColor(Color.BLACK);
@@ -95,12 +96,12 @@ public class Main_Content_Enrollment_Dialog extends Dialog implements View.OnCli
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.Enrollment:
-                if (Schedule_Edit.getText().length()>0) {
+                if (Schedule_Edit.getText().length() > 0) {
                     customDialogListener.PositiveClick(Schedule_Edit.getText().toString(), Position);
                     dismiss();
-                }else
+                } else
                     Toast.makeText(context, "일정을 입력해주세요.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.Cancle:

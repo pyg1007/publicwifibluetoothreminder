@@ -48,7 +48,6 @@ public class RestartService extends Service {
         Notification notification = builder.build();
         startForeground(9, notification);
 
-        /////////////////////////////////////////////////////////////////////
         Intent in = new Intent(this, BluetoothWifiService.class);
         in.putExtra("ReStarted", true);
         startService(in);

@@ -14,7 +14,7 @@ public class WifiBluetoothRepository {
 
     private LiveData<List<WifiBluetoothList>> Wifibluetoothlist;
 
-    public WifiBluetoothRepository(Application application){
+    public WifiBluetoothRepository(Application application) {
         ListDatabase listDatabase = ListDatabase.getDatabase(application);
 
         wifiBluetoothListDao = listDatabase.wifiBluetoothListDao();
@@ -22,12 +22,12 @@ public class WifiBluetoothRepository {
         Wifibluetoothlist = wifiBluetoothListDao.getAll();
     }
 
-    public LiveData<List<WifiBluetoothList>> getAllData(){
+    public LiveData<List<WifiBluetoothList>> getAllData() {
         return Wifibluetoothlist;
     }
 
 
-    public void insert(final WifiBluetoothList wifiBluetoothList){
+    public void insert(final WifiBluetoothList wifiBluetoothList) {
         Runnable addRunnable = new Runnable() {
             @Override
             public void run() {
@@ -38,7 +38,7 @@ public class WifiBluetoothRepository {
         IO.execute(addRunnable);
     }
 
-    public void update(final String Mac, final String NickName){
+    public void update(final String Mac, final String NickName) {
         Runnable updateRunnable = new Runnable() {
             @Override
             public void run() {
@@ -49,7 +49,7 @@ public class WifiBluetoothRepository {
         Update.execute(updateRunnable);
     }
 
-    public void updatecount(final String Mac, final int Count){
+    public void updatecount(final String Mac, final int Count) {
         Runnable updateRunnable = new Runnable() {
             @Override
             public void run() {
@@ -60,7 +60,7 @@ public class WifiBluetoothRepository {
         Update.execute(updateRunnable);
     }
 
-    public void delete(final String Mac){
+    public void delete(final String Mac) {
         Runnable deleteRunnable = new Runnable() {
             @Override
             public void run() {

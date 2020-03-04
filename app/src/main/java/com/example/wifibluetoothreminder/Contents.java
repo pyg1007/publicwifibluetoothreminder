@@ -42,7 +42,7 @@ import com.google.android.gms.ads.MobileAds;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Contents extends AppCompatActivity implements ContentsModelAdapter.OnListItemClickInterface, ContentsModelAdapter.OnListItemLongClickInterface{
+public class Contents extends AppCompatActivity implements ContentsModelAdapter.OnListItemClickInterface, ContentsModelAdapter.OnListItemLongClickInterface {
 
     //google Admob관련
     private AdView adView;
@@ -120,8 +120,8 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         AdmobTest();
     }
 
-    public void AdmobTest(){
-        adView.setAdListener(new AdListener(){
+    public void AdmobTest() {
+        adView.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
                 super.onAdClosed();
@@ -131,7 +131,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
             @Override
             public void onAdFailedToLoad(int i) {
                 super.onAdFailedToLoad(i);
-                Log.e("onAdFailedToLoad", "onAdFailedToLoad"+i);
+                Log.e("onAdFailedToLoad", "onAdFailedToLoad" + i);
             }
 
             @Override
@@ -176,12 +176,12 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     private BroadcastReceiver HomeKeyPress = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())){
-                if ("homekey".equals(intent.getStringExtra("reason"))){
+            if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())) {
+                if ("homekey".equals(intent.getStringExtra("reason"))) {
                     if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
                         stopService(new Intent(Contents.this, BluetoothWifiService.class));
                     finish();
-                }else if ("recentapps".equals(intent.getStringExtra("reason"))){
+                } else if ("recentapps".equals(intent.getStringExtra("reason"))) {
                     Log.e("TAG : ", "homekeyLongClick");
                 }
             }
@@ -261,11 +261,12 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
                     @Override
                     public void PositiveClick(String Contents) {
-                        if (Contents.length()>0) {
+                        if (Contents.length() > 0) {
                             contentListViewModel.Insert(new ContentList(Mac, SSID, Contents));
                             contentsModelAdapter.notifyDataSetChanged();
                         }
                     }
+
                     @Override
                     public void NegativeClick() {
 
@@ -274,11 +275,11 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 return true;
             case R.id.Select:
                 Clickcount++;
-                if (Clickcount % 2 == 1){
+                if (Clickcount % 2 == 1) {
                     item.setIcon(R.drawable.ic_delete_24dp);
                     contentsModelAdapter.setCount(Clickcount);
                     contentsModelAdapter.notifyDataSetChanged();
-                }else{
+                } else {
                     if (contentsModelAdapter.getCheckedlist().size() != 0) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
                         builder.setMessage(contentsModelAdapter.getCheckedlist().size() + "개의 일정을 삭제 하시겠습니까?");
@@ -291,6 +292,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                                     contentListViewModel.Delete(list.get(j).ID, list.get(j).getContent());
                                 }
                                 item.setIcon(R.drawable.ic_check_24dp);
+                                contentsModelAdapter.ClearSparseBooleanArray();
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
                         });
@@ -299,11 +301,12 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 contentsModelAdapter.setCount(Clickcount);
                                 item.setIcon(R.drawable.ic_check_24dp);
+                                contentsModelAdapter.ClearSparseBooleanArray();
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
                         });
                         builder.show();
-                    }else{
+                    } else {
                         contentsModelAdapter.setCount(Clickcount);
                         item.setIcon(R.drawable.ic_check_24dp);
                         contentsModelAdapter.notifyDataSetChanged();
@@ -322,7 +325,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         }
     }
 
-    public void CustomDialog_Resize(Dialog dialog, float horizontal, float vertical){
+    public void CustomDialog_Resize(Dialog dialog, float horizontal, float vertical) {
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);

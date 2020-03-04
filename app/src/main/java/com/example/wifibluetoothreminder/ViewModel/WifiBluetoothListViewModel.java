@@ -16,29 +16,29 @@ public class WifiBluetoothListViewModel extends AndroidViewModel {
 
     private LiveData<List<WifiBluetoothList>> Wifibluetoothlist;
 
-    public WifiBluetoothListViewModel(Application application){
+    public WifiBluetoothListViewModel(Application application) {
         super(application);
         wifiBluetoothRepository = new WifiBluetoothRepository(application);
         Wifibluetoothlist = wifiBluetoothRepository.getAllData();
     }
 
-    public LiveData<List<WifiBluetoothList>> getAllData(){
+    public LiveData<List<WifiBluetoothList>> getAllData() {
         return Wifibluetoothlist;
     }
 
-    public void insert(WifiBluetoothList wifiBluetoothList){
+    public void insert(WifiBluetoothList wifiBluetoothList) {
         wifiBluetoothRepository.insert(wifiBluetoothList);
     }
 
-    public void update(String Mac, String NickName){
+    public void update(String Mac, String NickName) {
         wifiBluetoothRepository.update(Mac, NickName);
     }
 
-    public void updateCount(String Mac, int count){
+    public void updateCount(String Mac, int count) {
         wifiBluetoothRepository.updatecount(Mac, count);
     }
 
-    public void delete(String Mac){
+    public void delete(String Mac) {
         wifiBluetoothRepository.delete(Mac);
     }
 }

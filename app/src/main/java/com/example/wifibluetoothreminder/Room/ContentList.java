@@ -20,7 +20,7 @@ public class ContentList {
     @NonNull
     public String Content;
 
-    public ContentList(@NonNull String Mac, @NonNull String Content_SSID, @NonNull String Content){
+    public ContentList(@NonNull String Mac, @NonNull String Content_SSID, @NonNull String Content) {
         this.Mac = Mac;
         this.Content_SSID = Content_SSID;
         this.Content = Content;

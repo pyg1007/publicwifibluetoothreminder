@@ -33,7 +33,7 @@ public class Splash extends AppCompatActivity {
 
             if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED || ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED)
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_LOCATION);
-            else if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED){
+            else if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED) {
                 Handler handler = new Handler();
                 handler.postDelayed(new SplashHandler(), 1000);
             }
@@ -54,10 +54,10 @@ public class Splash extends AppCompatActivity {
                     check = true;
                 }
             }
-            if (check){
+            if (check) {
                 Handler handler = new Handler();
                 handler.postDelayed(new SplashHandler(), 1000);
-            }else{
+            } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("권한").setMessage("해당 어플리케이션을 사용하기 위해서 필요합니다. 정말 거부하시겠습니까?");
                 builder.setPositiveButton("승인", new DialogInterface.OnClickListener() {
@@ -88,11 +88,16 @@ public class Splash extends AppCompatActivity {
         }
     }
 
-    private class SplashHandler implements Runnable{
+    private class SplashHandler implements Runnable {
         @Override
         public void run() {
             startActivity(new Intent(Splash.this, MainActivity.class));
             Splash.this.finish();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 }

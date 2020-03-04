@@ -29,6 +29,7 @@ public class NickNameDialog extends Dialog implements View.OnClickListener {
 
     public interface CustomDialogListener {
         void PositiveClick(String NickName);
+
         void NegativeClick();
     }
 

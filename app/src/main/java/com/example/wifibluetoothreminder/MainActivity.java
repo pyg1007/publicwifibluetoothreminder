@@ -58,9 +58,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     // google Admob관련
     private AdView adView;
 
-    // 변경되지 않을 상수
-    private static final int REQUEST_ACCESS_LOCATION = 1000;
-
     public List<WifiBluetoothList> list;
     public RecyclerView recyclerView;
     public MainRecyclerViewAdapter mainRecyclerViewAdapter;
@@ -88,8 +85,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 if (wifiBluetoothLists.size() != 0) {
                     MainText.setVisibility(View.GONE);
                     list.addAll(wifiBluetoothLists);
-                }
-                else
+                } else
                     MainText.setVisibility(View.VISIBLE);
                 mainRecyclerViewAdapter.notifyDataSetChanged();
             }
@@ -101,12 +97,12 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private BroadcastReceiver HomeKeyPress = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())){
-                if ("homekey".equals(intent.getStringExtra("reason"))){
+            if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())) {
+                if ("homekey".equals(intent.getStringExtra("reason"))) {
                     if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
                         stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
                     finish();
-                }else if ("recentapps".equals(intent.getStringExtra("reason"))){
+                } else if ("recentapps".equals(intent.getStringExtra("reason"))) {
                     Log.e("TAG : ", "homekeyLongClick");
                 }
             }
@@ -162,8 +158,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         AdmobTest();
     }
 
-    public void AdmobTest(){
-        adView.setAdListener(new AdListener(){
+    public void AdmobTest() {
+        adView.setAdListener(new AdListener() {
             @Override
             public void onAdClosed() {
                 super.onAdClosed();
@@ -173,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             @Override
             public void onAdFailedToLoad(int i) {
                 super.onAdFailedToLoad(i);
-                Log.e("onAdFailedToLoad", "onAdFailedToLoad"+i);
+                Log.e("onAdFailedToLoad", "onAdFailedToLoad" + i);
             }
 
             @Override
@@ -249,23 +245,10 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     }
 
     public void AutoService() {
-        // TODO : 출처 : https://forest71.tistory.com/185
-//        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
-//        boolean isWhiteListing = false;
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-//            isWhiteListing = pm.isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
-//        }
-//        if (!isWhiteListing) {
-//            Intent intent = new Intent();
-//            intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-//            intent.setData(Uri.parse("package:" + getApplicationContext().getPackageName()));
-//            startActivity(intent);
-//        }
-
         if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) {
             Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);
             startService(intent);
-        }else{
+        } else {
             Intent intent = new Intent("Activity_to_Service");
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
@@ -274,18 +257,14 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if ("Service_to_Activity".equals(intent.getAction())){
+            if ("Service_to_Activity".equals(intent.getAction())) {
                 try {
                     String DeviceType = intent.getStringExtra("DeviceType");
                     String Mac = intent.getStringExtra("Mac");
                     String SSID = intent.getStringExtra("SSID");
-                    Log.e("ForeGround : ", "ForeGround");
-                    Log.e("DeviceType : ", DeviceType);
-                    Log.e("Mac : ", Mac);
-                    Log.e("SSID : ", SSID);
                     if (DeviceType != null && Mac != null && SSID != null)
                         setFirstDetectDialog(DeviceType, Mac, SSID);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -326,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                                 if (NickName.length() > 0) {
                                     wifiBluetoothListViewModel.update(list.get(position).getMac(), NickName);
                                     mainRecyclerViewAdapter.notifyDataSetChanged();
-                                }else {
+                                } else {
                                     wifiBluetoothListViewModel.update(list.get(position).getMac(), list.get(position).getSSID());
                                     mainRecyclerViewAdapter.notifyDataSetChanged();
                                 }
@@ -409,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                         @Override
                         public void PositiveClick(String Content, int position) {
                             contentListViewModel.Insert(new ContentList(list.get(position).getMac(), list.get(position).getSSID(), Content));
-                            wifiBluetoothListViewModel.updateCount(list.get(position).getMac(), list.get(position).getCount()+1);
+                            wifiBluetoothListViewModel.updateCount(list.get(position).getMac(), list.get(position).getCount() + 1);
                             mainRecyclerViewAdapter.notifyDataSetChanged();
                         }
 
@@ -420,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                     });
                     main_content_enrollment_dialog.show();
                     CustomDialog_Resize(main_content_enrollment_dialog, 0.9f, 0.3f);
-                }else{
+                } else {
                     Intent intent = new Intent("Activity_to_Service");
                     LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
                 }
@@ -430,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         }
     }
 
-    public void CustomDialog_Resize(Dialog dialog, float horizontal, float vertical){
+    public void CustomDialog_Resize(Dialog dialog, float horizontal, float vertical) {
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);

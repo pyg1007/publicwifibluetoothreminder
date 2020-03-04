@@ -24,19 +24,23 @@ public class ContentListViewModel extends AndroidViewModel {
         Contentlist = contentListRepository.getAllData();
     }
 
-    public LiveData<List<ContentList>> getAll(){return Contentlist;}
+    public LiveData<List<ContentList>> getAll() {
+        return Contentlist;
+    }
 
-    public void Insert(ContentList contentList){
+    public void Insert(ContentList contentList) {
         contentListRepository.Insert(contentList);
     }
 
-    public void Update(int ID, String Content){
+    public void Update(int ID, String Content) {
         contentListRepository.Update(ID, Content);
     }
 
-    public void Delete(int ID, String Content){
+    public void Delete(int ID, String Content) {
         contentListRepository.Delete(ID, Content);
     }
 
-    public void DeleteAll(String Content_SSID){contentListRepository.DeleteAll(Content_SSID);}
+    public void DeleteAll(String Content_SSID) {
+        contentListRepository.DeleteAll(Content_SSID);
+    }
 }

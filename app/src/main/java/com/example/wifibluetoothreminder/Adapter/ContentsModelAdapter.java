@@ -1,6 +1,7 @@
 package com.example.wifibluetoothreminder.Adapter;
 
 import android.content.Context;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,8 @@ import java.util.List;
 public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdapter.CustomViewHolder> {
 
     private List<ContentList> list;
-    private List<ContentList> checkedlist;
+    private List<ContentList> checkedlist = new ArrayList<>();
+    SparseBooleanArray sparseBooleanArray = new SparseBooleanArray();
 
     private int count;
 
@@ -67,6 +69,13 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
                     return false;
                 }
             });
+        }
+
+        public void bind(int position) {
+            if (!sparseBooleanArray.get(position, false))
+                checkBox.setChecked(false);
+            else
+                checkBox.setChecked(true);
 
         }
     }
@@ -83,35 +92,47 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ContentsModelAdapter.CustomViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ContentsModelAdapter.CustomViewHolder holder, final int position) {
         holder.ContentView.setText(list.get(position).getContent());
-        checkedlist = new ArrayList<>();
-        if (getCount() % 2 == 0)
+        if (getCount() % 2 == 0) {
             holder.checkBox.setVisibility(View.GONE);
-        else if (getCount() % 2 == 1) {
+        } else if (getCount() % 2 == 1) {
             holder.checkBox.setVisibility(View.VISIBLE);
-            holder.checkBox.setChecked(false);
+            holder.checkBox.setOnCheckedChangeListener(null);
+            holder.bind(position);
             holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if (b)
-                        checkedlist.add(list.get(position));
-                    else
-                        checkedlist.remove(list.get(position));
+                    if (!sparseBooleanArray.get(position, false)) {
+                        holder.checkBox.setChecked(true);
+                        sparseBooleanArray.put(position, true);
+                    } else {
+                        holder.checkBox.setChecked(false);
+                        sparseBooleanArray.put(position, false);
+                    }
                 }
             });
         }
     }
 
-    public List<ContentList> getCheckedlist(){
+    public void ClearSparseBooleanArray() {
+        sparseBooleanArray.clear();
+    }
+
+    public List<ContentList> getCheckedlist() {
+        checkedlist.clear();
+        for (int i = 0; i < sparseBooleanArray.size(); i++) {
+            if (sparseBooleanArray.get(i, true))
+                checkedlist.add(list.get(i));
+        }
         return checkedlist;
     }
 
-    public void setCount(int Count){
+    public void setCount(int Count) {
         count = Count;
     }
 
-    public int getCount(){
+    public int getCount() {
         return count;
     }
 
