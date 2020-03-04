@@ -1,6 +1,5 @@
 package com.example.wifibluetoothreminder.CustomDialog;
 
-
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -17,13 +16,11 @@ import androidx.annotation.NonNull;
 
 import com.example.wifibluetoothreminder.R;
 
-public class NickNameDialog extends Dialog implements View.OnClickListener {
-
+public class NickNameEditDialog extends Dialog implements View.OnClickListener {
 
     private TextView Title;
-    private EditText editNickName;
-    private Button PositiveButton;
-    private Button NegativeButton;
+    private Button Change, Cancle;
+    private EditText NickName_editText;
 
     public CustomDialogListener customDialogListener;
 
@@ -32,12 +29,12 @@ public class NickNameDialog extends Dialog implements View.OnClickListener {
         void NegativeClick();
     }
 
-    public void setDialogListener(CustomDialogListener customDialogListener) {
-        this.customDialogListener = customDialogListener;
+    public NickNameEditDialog(@NonNull Context context) {
+        super(context);
     }
 
-    public NickNameDialog(@NonNull Context context) {
-        super(context);
+    public void setDialogListener(CustomDialogListener customDialogListener) {
+        this.customDialogListener = customDialogListener;
     }
 
     @Override
@@ -45,29 +42,29 @@ public class NickNameDialog extends Dialog implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_main_list_dialog);
+        setContentView(R.layout.nick_name_edit_dialog);
         UI();
     }
 
-    public void UI() {
+    public void UI(){
+        NickName_editText = findViewById(R.id.NickName);
         Title = findViewById(R.id.Title);
-        Title.setGravity(Gravity.CENTER);
-        Title.setText("기기 등록");
         Title.setTextColor(Color.BLACK);
-        editNickName = findViewById(R.id.NickName);
+        Title.setText("별명 변경");
+        Title.setGravity(Gravity.CENTER);
 
-        PositiveButton = findViewById(R.id.Enrollment);
-        NegativeButton = findViewById(R.id.Cancle);
+        Change = findViewById(R.id.Change);
+        Cancle = findViewById(R.id.Cancle);
 
-        PositiveButton.setOnClickListener(this);
-        NegativeButton.setOnClickListener(this);
+        Change.setOnClickListener(this);
+        Cancle.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.Enrollment:
-                customDialogListener.PositiveClick(editNickName.getText().toString());
+        switch (view.getId()){
+            case R.id.Change:
+                customDialogListener.PositiveClick(NickName_editText.getText().toString());
                 dismiss();
                 break;
             case R.id.Cancle:
@@ -76,4 +73,6 @@ public class NickNameDialog extends Dialog implements View.OnClickListener {
                 break;
         }
     }
+
+
 }

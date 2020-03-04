@@ -1,49 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/edgeround"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/Title"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/titleround"
+        android:layout_weight="1.5" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="2sp"
+        android:layout_marginTop="2sp"
+        android:layout_marginEnd="2sp"
+        android:layout_marginBottom="2sp"
+        android:layout_weight="2"
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
+            android:id="@+id/NickName_Text"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="2sp"
             android:layout_weight="1"
-            android:textSize="20dp"
-            android:textColor="#0078FF"
-            android:text="기기명" />
+            android:text="기기명"
+            android:textSize="20dp" />
 
         <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="wrap_content"
+            android:id="@+id/NickName_Spinner"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_marginStart="2sp"
+            android:layout_weight="2" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="2sp"
+        android:layout_marginTop="2sp"
+        android:layout_marginEnd="2sp"
+        android:layout_marginBottom="2sp"
+        android:layout_weight="4"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/Schedule"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:textColor="#0078FF"
-            android:text="일정" />
+            android:layout_height="0dp"
+            android:layout_marginBottom="2sp"
+            android:layout_weight="1"
+            android:text="일정"
+            android:textSize="20dp" />
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/Schedule_Edit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:textSize="15dp"
-            android:inputType="textPersonName" />
+            android:layout_height="0dp"
+            android:layout_marginTop="2sp"
+            android:layout_weight="3"
+            android:background="@drawable/edittextround"
+            android:textSize="15dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="2sp"
+        android:layout_marginTop="2sp"
+        android:layout_marginEnd="2sp"
+        android:layout_marginBottom="2sp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/Cancle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="2sp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonround"
+            android:text="취소"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/Enrollment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2sp"
+            android:layout_weight="1"
+            android:background="@drawable/buttonround"
+            android:text="등록"
+            android:textSize="20sp" />
     </LinearLayout>
 
 </LinearLayout>

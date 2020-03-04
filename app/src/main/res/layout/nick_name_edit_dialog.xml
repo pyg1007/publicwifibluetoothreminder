@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/edgeround"
-    android:orientation="vertical"
-    tools:context=".CustomDialog.ContentDialog">
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/Content_Dialog_Title"
+        android:id="@+id/Title"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="2sp"
@@ -26,15 +23,15 @@
         android:layout_marginTop="2sp"
         android:layout_marginEnd="2sp"
         android:layout_marginBottom="2sp"
-        android:layout_weight="6"
-        android:orientation="horizontal">
+        android:layout_weight="6">
 
         <EditText
-            android:id="@+id/Content"
+            android:id="@+id/NickName"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="5sp"
-            android:background="@drawable/edittextround" />
+            android:background="@drawable/edittextround"
+            android:hint="별명을 지정하지 않으면 장비이름으로저장됩니다."
+            android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -51,18 +48,21 @@
             android:id="@+id/Cancle"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginRight="2sp"
+            android:layout_marginEnd="2sp"
             android:layout_weight="1"
             android:background="@drawable/buttonround"
-            android:text="취소" />
+            android:text="취소"
+            android:textSize="20sp" />
 
         <Button
-            android:id="@+id/Enrollment"
+            android:id="@+id/Change"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="2sp"
+            android:layout_marginStart="2sp"
             android:layout_weight="1"
             android:background="@drawable/buttonround"
-            android:text="확인" />
+            android:text="변경"
+            android:textSize="20sp" />
     </LinearLayout>
+
 </LinearLayout>

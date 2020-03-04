@@ -2,6 +2,7 @@ package com.example.wifibluetoothreminder;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,10 +18,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -43,7 +47,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wifibluetoothreminder.Adapter.MainRecyclerViewAdapter;
+import com.example.wifibluetoothreminder.CustomDialog.Main_Content_Enrollment_Dialog;
 import com.example.wifibluetoothreminder.CustomDialog.NickNameDialog;
+import com.example.wifibluetoothreminder.CustomDialog.NickNameEditDialog;
 import com.example.wifibluetoothreminder.Room.ContentList;
 import com.example.wifibluetoothreminder.Room.ContentListDao;
 import com.example.wifibluetoothreminder.Room.ListDatabase;
@@ -254,8 +260,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
             }
         });
-        if (!nickNameDialog.isShowing())
-            nickNameDialog.show();
+        nickNameDialog.show();
+        CustomDialog_Resize(nickNameDialog, 0.9f, 0.2f);
     }
 
     public void checkpermmission() {
@@ -369,15 +375,17 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.edit: // 편집
-                        NickNameDialog mainListDialog = new NickNameDialog(MainActivity.this);
-                        StartLog("SSID : ", list.get(position).getSSID());
-                        mainListDialog.setCancelable(false);
-                        mainListDialog.setDialogListener(new NickNameDialog.CustomDialogListener() {
+                        NickNameEditDialog nickNameEditDialog = new NickNameEditDialog(MainActivity.this);
+                        nickNameEditDialog.setDialogListener(new NickNameEditDialog.CustomDialogListener() {
                             @Override
                             public void PositiveClick(String NickName) {
-                                //TODO : 업데이트문 실행
-                                wifiBluetoothListViewModel.update(list.get(position).getMac(), NickName);
-                                mainRecyclerViewAdapter.notifyDataSetChanged();
+                                if (NickName.length() > 0) {
+                                    wifiBluetoothListViewModel.update(list.get(position).getMac(), NickName);
+                                    mainRecyclerViewAdapter.notifyDataSetChanged();
+                                }else {
+                                    wifiBluetoothListViewModel.update(list.get(position).getMac(), list.get(position).getSSID());
+                                    mainRecyclerViewAdapter.notifyDataSetChanged();
+                                }
                             }
 
                             @Override
@@ -385,7 +393,9 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
                             }
                         });
-                        mainListDialog.show();
+                        nickNameEditDialog.show();
+                        nickNameEditDialog.setCancelable(false);
+                        CustomDialog_Resize(nickNameEditDialog, 0.9f, 0.2f);
                         break;
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
@@ -450,43 +460,22 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                     ssid_List.add(list.get(i).getNickName());
                 }
                 if (ssid_List.size() != 0) {
-                    dialogView = (View) View.inflate(MainActivity.this, R.layout.menudialog, null);
-                    Spinner spinner = dialogView.findViewById(R.id.spinner);
-
-                    Log.e("index : ", String.valueOf(ssid_List.indexOf("fdd")));
-                    ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, ssid_List);
-                    spinner.setAdapter(arrayAdapter);
-                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    Main_Content_Enrollment_Dialog main_content_enrollment_dialog = new Main_Content_Enrollment_Dialog(MainActivity.this, ssid_List);
+                    main_content_enrollment_dialog.setDialogListener(new Main_Content_Enrollment_Dialog.CustomDialogListener() {
                         @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            SpinierPosition = i;
+                        public void PositiveClick(String Content, int position) {
+                            contentListViewModel.Insert(new ContentList(list.get(position).getMac(), list.get(position).getSSID(), Content));
+                            wifiBluetoothListViewModel.updateCount(list.get(position).getMac(), list.get(position).getCount()+1);
+                            mainRecyclerViewAdapter.notifyDataSetChanged();
                         }
 
                         @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
+                        public void NegativeClick() {
 
                         }
                     });
-                    final EditText editText = dialogView.findViewById(R.id.editText2);
-                    AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
-                    dlg.setTitle("일정 등록");
-                    dlg.setView(dialogView);
-                    dlg.setPositiveButton("확인", null);
-                    dlg.setNegativeButton("취소", null);
-                    final AlertDialog alertDialog = dlg.create();
-                    alertDialog.show();
-                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if (editText.getText().length() > 0) {
-                                contentListViewModel.Insert(new ContentList(list.get(SpinierPosition).getMac(), list.get(SpinierPosition).getSSID(), editText.getText().toString()));
-                                wifiBluetoothListViewModel.updateCount(list.get(SpinierPosition).getMac(), list.get(SpinierPosition).getCount() + 1);
-                                mainRecyclerViewAdapter.notifyDataSetChanged();
-                                alertDialog.dismiss();
-                            } else
-                                StartToast("일정 내용을 입력해주세요");
-                        }
-                    });
+                    main_content_enrollment_dialog.show();
+                    CustomDialog_Resize(main_content_enrollment_dialog, 0.9f, 0.3f);
                 }else{
                     Intent intent = new Intent("Activity_to_Service");
                     LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -495,5 +484,18 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void CustomDialog_Resize(Dialog dialog, float horizontal, float vertical){
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        Window window = dialog.getWindow();
+
+        int x = (int) (size.x * horizontal);
+        int y = (int) (size.y * vertical);
+
+        window.setLayout(x, y);
     }
 }

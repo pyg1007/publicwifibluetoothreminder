@@ -1,17 +1,22 @@
 package com.example.wifibluetoothreminder;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -253,6 +258,8 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         switch (item.getItemId()) {
             case R.id.Add:
                 ContentDialog dialog = new ContentDialog(Contents.this);
+                dialog.show();
+                CustomDialog_Resize(dialog, 0.9f, 0.2f);
                 dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
                     @Override
                     public void PositiveClick(String Contents) {
@@ -266,7 +273,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
                     }
                 });
-                dialog.show();
                 return true;
             case R.id.Select:
                 Clickcount++;
@@ -316,6 +322,19 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
 
+    public void CustomDialog_Resize(Dialog dialog, float horizontal, float vertical){
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        Window window = dialog.getWindow();
+
+        int x = (int) (size.x * horizontal);
+        int y = (int) (size.y * vertical);
+
+        if (window != null)
+            window.setLayout(x, y);
     }
 }
