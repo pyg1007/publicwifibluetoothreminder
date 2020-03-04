@@ -1,22 +1,16 @@
 package com.example.wifibluetoothreminder;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.PowerManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -24,21 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.PopupMenu;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -83,10 +69,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
     private WifiBluetoothListViewModel wifiBluetoothListViewModel;
     private ContentListViewModel contentListViewModel;
-    private View dialogView;
     private ServiceRunningCheck serviceRunningCheck;
 
-    private int SpinierPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         setContentView(R.layout.activity_main);
 
         UI();
-        checkpermmission();
 
         wifiBluetoothListViewModel = new ViewModelProvider(this).get(WifiBluetoothListViewModel.class);
         contentListViewModel = new ViewModelProvider(this).get(ContentListViewModel.class);
@@ -140,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     @Override
     protected void onResume() {
         super.onResume();
+        AutoService();
         IntentFilter intentFilter = new IntentFilter("Service_to_Activity");
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
         IntentFilter filter = new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
@@ -264,59 +248,19 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         CustomDialog_Resize(nickNameDialog, 0.9f, 0.2f);
     }
 
-    public void checkpermmission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int ACCESS_FINE_LOCATION_PERMISSION = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-            int ACCESS_COARSE_LOCATION_PERMISSION = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
-
-            if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED || ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED)
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_LOCATION);
-            else if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED)
-                AutoService();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("권한").setMessage("WIFI의 정보를 받아오기 위해서 필요합니다. 정말 거부하시겠습니까?");
-            builder.setPositiveButton("승인", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    checkpermmission();
-                }
-            });
-            builder.setNegativeButton("거부", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    AlertDialog.Builder no = new AlertDialog.Builder(MainActivity.this);
-                    no.setMessage("해당기능을 사용하기 위해서는 설정 -> App 및 알림 -> App 선택 -> 권한 -> 허용을 해주세요").show();
-                }
-            });
-            builder.show();
-        }else{
-            AutoService();
-        }
-    }
-
     public void AutoService() {
         // TODO : 출처 : https://forest71.tistory.com/185
-        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
-        boolean isWhiteListing = false;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            isWhiteListing = pm.isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
-        }
-        if (!isWhiteListing) {
-            Intent intent = new Intent();
-            intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-            intent.setData(Uri.parse("package:" + getApplicationContext().getPackageName()));
-            startActivity(intent);
-        }
+//        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
+//        boolean isWhiteListing = false;
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//            isWhiteListing = pm.isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+//        }
+//        if (!isWhiteListing) {
+//            Intent intent = new Intent();
+//            intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+//            intent.setData(Uri.parse("package:" + getApplicationContext().getPackageName()));
+//            startActivity(intent);
+//        }
 
         if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) {
             Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);

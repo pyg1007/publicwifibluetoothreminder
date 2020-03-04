@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -17,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -334,7 +332,6 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         int x = (int) (size.x * horizontal);
         int y = (int) (size.y * vertical);
 
-        if (window != null)
-            window.setLayout(x, y);
+        window.setLayout(x, y);
     }
 }
