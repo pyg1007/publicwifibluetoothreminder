@@ -5,12 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#ffff9e"
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/MainToolbar"
-        android:background="#ff8c0a"
+        android:background="#EB0000"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

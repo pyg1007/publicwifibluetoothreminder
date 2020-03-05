@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffff9e"
     android:orientation="vertical"
     tools:context=".Contents">
 
@@ -12,7 +11,7 @@
         android:id="@+id/ContentsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ff8c0a" />
+        android:background="#EB0000" />
 
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/Contents_AdMob"
