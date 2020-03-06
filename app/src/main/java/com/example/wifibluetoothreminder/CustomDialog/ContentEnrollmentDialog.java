@@ -17,7 +17,7 @@ import androidx.annotation.NonNull;
 
 import com.example.wifibluetoothreminder.R;
 
-public class ContentDialog extends Dialog implements View.OnClickListener {
+public class ContentEnrollmentDialog extends Dialog implements View.OnClickListener {
 
     private Context context;
 
@@ -39,6 +39,7 @@ public class ContentDialog extends Dialog implements View.OnClickListener {
 
     public void UI() {
         Content = findViewById(R.id.Content);
+        Content.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
         textView = findViewById(R.id.Content_Dialog_Title);
         textView.setText("일정등록");
         textView.setGravity(Gravity.CENTER);
@@ -57,11 +58,11 @@ public class ContentDialog extends Dialog implements View.OnClickListener {
         void NegativeClick();
     }
 
-    public void setDialogListener(ContentDialog.CustomDialogListener customDialogListener) {
+    public void setDialogListener(ContentEnrollmentDialog.CustomDialogListener customDialogListener) {
         this.customDialogListener = customDialogListener;
     }
 
-    public ContentDialog(@NonNull Context context) {
+    public ContentEnrollmentDialog(@NonNull Context context) {
         super(context);
         this.context = context;
     }

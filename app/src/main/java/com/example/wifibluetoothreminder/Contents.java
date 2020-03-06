@@ -29,7 +29,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wifibluetoothreminder.Adapter.ContentsModelAdapter;
-import com.example.wifibluetoothreminder.CustomDialog.ContentDialog;
+import com.example.wifibluetoothreminder.CustomDialog.ContentEditDialog;
+import com.example.wifibluetoothreminder.CustomDialog.ContentEnrollmentDialog;
+import com.example.wifibluetoothreminder.CustomDialog.DetailContent;
 import com.example.wifibluetoothreminder.Room.ContentList;
 import com.example.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
 import com.example.wifibluetoothreminder.Service.BluetoothWifiService;
@@ -213,20 +215,18 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
             public boolean onMenuItemClick(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.edit: // 편집
-                        ContentDialog dialog = new ContentDialog(Contents.this);
-                        dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
+                        ContentEditDialog contentEditDialog = new ContentEditDialog(Contents.this);
+                        contentEditDialog.show();
+                        CustomDialog_Resize(contentEditDialog, 0.9f, 0.3f);
+                        contentEditDialog.setCancelable(false);
+                        contentEditDialog.setCustomDialogListener(new ContentEditDialog.CustomDialogListener() {
                             @Override
                             public void PositiveClick(String Contents) {
                                 contentListViewModel.Update(items.get(position).ID, Contents);
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
-
-                            @Override
-                            public void NegativeClick() {
-
-                            }
                         });
-                        dialog.show();
+
                         break;
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
@@ -241,8 +241,27 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     }
 
     @Override
-    public void onItemClick(View v, int position) {
-        ContentsModelAdapter.CustomViewHolder customViewHoler = (ContentsModelAdapter.CustomViewHolder) recyclerView.findViewHolderForAdapterPosition(position);
+    public void onItemClick(View v, final int position) {
+        final DetailContent detailContent = new DetailContent(this, items.get(position).getContent());
+        detailContent.show();
+        CustomDialog_Resize(detailContent, 0.9f, 0.3f);
+        detailContent.setCancelable(false);
+        detailContent.setListener(new DetailContent.CustomDialogListener() {
+            @Override
+            public void PositiveClick() {
+                ContentEditDialog contentEditDialog = new ContentEditDialog(Contents.this);
+                contentEditDialog.show();
+                CustomDialog_Resize(contentEditDialog, 0.9f, 0.3f);
+                contentEditDialog.setCancelable(false);
+                contentEditDialog.setCustomDialogListener(new ContentEditDialog.CustomDialogListener() {
+                    @Override
+                    public void PositiveClick(String Contents) {
+                        contentListViewModel.Update(items.get(position).ID, Contents);
+                        contentsModelAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -255,10 +274,11 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.Add:
-                ContentDialog dialog = new ContentDialog(Contents.this);
+                ContentEnrollmentDialog dialog = new ContentEnrollmentDialog(Contents.this);
                 dialog.show();
+                dialog.setCancelable(false);
                 CustomDialog_Resize(dialog, 0.9f, 0.2f);
-                dialog.setDialogListener(new ContentDialog.CustomDialogListener() {
+                dialog.setDialogListener(new ContentEnrollmentDialog.CustomDialogListener() {
                     @Override
                     public void PositiveClick(String Contents) {
                         if (Contents.length() > 0) {

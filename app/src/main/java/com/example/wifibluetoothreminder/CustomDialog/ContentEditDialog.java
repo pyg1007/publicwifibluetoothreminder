@@ -11,29 +11,32 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.wifibluetoothreminder.R;
 
-public class NickNameEditDialog extends Dialog implements View.OnClickListener {
+public class ContentEditDialog extends Dialog implements View.OnClickListener {
+
+    private Context context;
 
     private TextView Title;
-    private Button Change, Cancle;
-    private EditText NickName_editText;
+    private EditText Contents;
+    private Button Edit, Cancle;
 
-    public CustomDialogListener customDialogListener;
+    private CustomDialogListener customDialogListener;
 
-    public interface CustomDialogListener {
-        void PositiveClick(String NickName);
-        void NegativeClick();
+    public interface CustomDialogListener{
+        void PositiveClick(String Contents);
     }
 
-    public NickNameEditDialog(@NonNull Context context) {
+    public ContentEditDialog(@NonNull Context context) {
         super(context);
+        this.context = context;
     }
 
-    public void setDialogListener(CustomDialogListener customDialogListener) {
+    public void setCustomDialogListener(CustomDialogListener customDialogListener){
         this.customDialogListener = customDialogListener;
     }
 
@@ -42,38 +45,39 @@ public class NickNameEditDialog extends Dialog implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.nick_name_edit_dialog);
+        setContentView(R.layout.contenteditdialog);
         UI();
     }
 
     public void UI(){
-        NickName_editText = findViewById(R.id.NickName);
-        NickName_editText.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
         Title = findViewById(R.id.Title);
-        Title.setTextColor(Color.BLACK);
-        Title.setText("별명 변경");
+        Title.setText("일정 편집");
         Title.setGravity(Gravity.CENTER);
+        Title.setTextColor(Color.BLACK);
+        Contents = findViewById(R.id.Content);
+        Contents.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
 
-        Change = findViewById(R.id.Change);
+        Edit = findViewById(R.id.Edit);
         Cancle = findViewById(R.id.Cancle);
 
-        Change.setOnClickListener(this);
+        Edit.setOnClickListener(this);
         Cancle.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.Change:
-                customDialogListener.PositiveClick(NickName_editText.getText().toString());
-                dismiss();
+            case R.id.Edit:
+                if (Contents.getText().toString().length()>0){
+                    customDialogListener.PositiveClick(Contents.getText().toString());
+                    dismiss();
+                }else{
+                    Toast.makeText(context, "일정을 입력해주세요.", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.Cancle:
-                customDialogListener.NegativeClick();
                 cancel();
                 break;
         }
     }
-
-
 }

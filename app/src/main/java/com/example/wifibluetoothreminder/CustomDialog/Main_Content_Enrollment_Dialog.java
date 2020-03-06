@@ -77,6 +77,7 @@ public class Main_Content_Enrollment_Dialog extends Dialog implements View.OnCli
         Cancle.setOnClickListener(this);
 
         Schedule_Edit = findViewById(R.id.Schedule_Edit);
+        Schedule_Edit.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
 
         NickName_Spinner = findViewById(R.id.NickName_Spinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, NickName);
@@ -105,6 +106,7 @@ public class Main_Content_Enrollment_Dialog extends Dialog implements View.OnCli
                     Toast.makeText(context, "일정을 입력해주세요.", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.Cancle:
+                customDialogListener.NegativeClick();
                 cancel();
                 break;
         }

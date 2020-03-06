@@ -299,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 switch (menuItem.getItemId()) {
                     case R.id.edit: // 편집
                         NickNameEditDialog nickNameEditDialog = new NickNameEditDialog(MainActivity.this);
+                        nickNameEditDialog.setCancelable(false);
                         nickNameEditDialog.setDialogListener(new NickNameEditDialog.CustomDialogListener() {
                             @Override
                             public void PositiveClick(String NickName) {
@@ -384,6 +385,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                 }
                 if (ssid_List.size() != 0) {
                     Main_Content_Enrollment_Dialog main_content_enrollment_dialog = new Main_Content_Enrollment_Dialog(MainActivity.this, ssid_List);
+                    main_content_enrollment_dialog.setCancelable(false);
                     main_content_enrollment_dialog.setDialogListener(new Main_Content_Enrollment_Dialog.CustomDialogListener() {
                         @Override
                         public void PositiveClick(String Content, int position) {

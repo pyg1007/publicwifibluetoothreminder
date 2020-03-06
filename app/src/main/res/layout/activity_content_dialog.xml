@@ -4,46 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/edgeround"
+    android:background="#FFFFFF"
     android:orientation="vertical"
-    tools:context=".CustomDialog.ContentDialog">
+    tools:context=".CustomDialog.ContentEnrollmentDialog">
 
     <TextView
         android:id="@+id/Content_Dialog_Title"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="2sp"
-        android:layout_marginTop="2sp"
-        android:layout_marginEnd="2sp"
-        android:layout_marginBottom="2sp"
-        android:layout_weight="1.5"
-        android:background="@drawable/titleround" />
+        android:layout_weight="2"
+        android:background="@drawable/background_title" />
 
-    <LinearLayout
+
+    <EditText
+        android:id="@+id/Content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="2sp"
-        android:layout_marginTop="2sp"
-        android:layout_marginEnd="2sp"
-        android:layout_marginBottom="2sp"
         android:layout_weight="6"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/Content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="5sp"
-            android:background="@drawable/edittextround" />
-    </LinearLayout>
+        android:background="@drawable/background_edittext" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="2sp"
-        android:layout_marginTop="2sp"
-        android:layout_marginEnd="2sp"
-        android:layout_marginBottom="2sp"
         android:layout_weight="2"
         android:orientation="horizontal">
 
@@ -51,18 +33,21 @@
             android:id="@+id/Cancle"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginRight="2sp"
             android:layout_weight="1"
-            android:background="@drawable/buttonround"
+            android:background="@drawable/background_button"
             android:text="취소" />
+
+        <View
+            android:layout_width="2sp"
+            android:layout_height="match_parent"
+            android:background="#000000" />
 
         <Button
             android:id="@+id/Enrollment"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="2sp"
             android:layout_weight="1"
-            android:background="@drawable/buttonround"
+            android:background="@drawable/background_button"
             android:text="확인" />
     </LinearLayout>
 </LinearLayout>

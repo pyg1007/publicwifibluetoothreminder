@@ -2,24 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/edgeround"
+    android:background="#FFFFFF"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/Title"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/titleround"
-
-        android:layout_weight="1.5" />
+        android:background="@drawable/background_title"
+        android:layout_weight="2" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="2sp"
-        android:layout_marginTop="2sp"
-        android:layout_marginEnd="2sp"
-        android:layout_marginBottom="2sp"
         android:layout_weight="2"
         android:orientation="horizontal">
 
@@ -43,10 +38,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="2sp"
-        android:layout_marginTop="2sp"
-        android:layout_marginEnd="2sp"
-        android:layout_marginBottom="2sp"
         android:layout_weight="4"
         android:orientation="vertical">
 
@@ -64,18 +55,16 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="2sp"
-            android:layout_weight="3"
-            android:background="@drawable/edittextround"
+            android:layout_marginBottom="2sp"
+            android:layout_weight="6"
+            android:background="@drawable/background_edittext"
             android:textSize="15dp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="2sp"
         android:layout_marginTop="2sp"
-        android:layout_marginEnd="2sp"
-        android:layout_marginBottom="2sp"
         android:layout_weight="2"
         android:orientation="horizontal">
 
@@ -83,19 +72,22 @@
             android:id="@+id/Cancle"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginEnd="2sp"
             android:layout_weight="1"
-            android:background="@drawable/buttonround"
+            android:background="@drawable/background_button"
             android:text="취소"
             android:textSize="20sp" />
+
+        <View
+            android:background="#000000"
+            android:layout_width="2sp"
+            android:layout_height="match_parent"/>
 
         <Button
             android:id="@+id/Enrollment"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="2sp"
             android:layout_weight="1"
-            android:background="@drawable/buttonround"
+            android:background="@drawable/background_button"
             android:text="등록"
             android:textSize="20sp" />
     </LinearLayout>

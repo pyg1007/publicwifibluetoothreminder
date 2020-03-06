@@ -55,7 +55,7 @@
             android:exported="true"
             android:stopWithTask="false" />
 
-        <activity android:name=".CustomDialog.ContentDialog" />
+        <activity android:name=".CustomDialog.ContentEnrollmentDialog" />
         <activity android:name=".CustomDialog.NickNameDialog" />
         <activity android:name=".Contents" />
         <activity android:name=".MainActivity" />
