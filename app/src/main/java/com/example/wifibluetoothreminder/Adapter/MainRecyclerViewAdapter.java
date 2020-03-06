@@ -90,9 +90,9 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         holder.NickName.setText(itemList.get(position).getNickName());
         holder.ContentsCount.setText(String.valueOf(itemList.get(position).getCount()));
         if (itemList.get(position).getDevice_Type().equals("Wifi"))
-            holder.DeviceName.setImageResource(R.drawable.ic_wifi_black_24dp);
+            holder.DeviceName.setImageResource(R.drawable.wifi);
         else if (itemList.get(position).getDevice_Type().equals("Bluetooth"))
-            holder.DeviceName.setImageResource(R.drawable.ic_bluetooth_black_24dp);
+            holder.DeviceName.setImageResource(R.drawable.bluetooth);
     }
 
     @Override
