@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wifibluetoothreminder.Adapter.ContentsModelAdapter;
+import com.example.wifibluetoothreminder.CustomDialog.ContentDeleteDialog;
 import com.example.wifibluetoothreminder.CustomDialog.ContentEditDialog;
 import com.example.wifibluetoothreminder.CustomDialog.ContentEnrollmentDialog;
 import com.example.wifibluetoothreminder.CustomDialog.DetailContent;
@@ -225,6 +226,11 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                                 contentListViewModel.Update(items.get(position).ID, Contents);
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
+
+                            @Override
+                            public void NegativeClick() {
+
+                            }
                         });
 
                         break;
@@ -259,7 +265,16 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         contentListViewModel.Update(items.get(position).ID, Contents);
                         contentsModelAdapter.notifyDataSetChanged();
                     }
+
+                    @Override
+                    public void NegativeClick() {
+
+                    }
                 });
+            }
+            @Override
+            public void NegativeClick() {
+
             }
         });
     }
@@ -277,7 +292,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 ContentEnrollmentDialog dialog = new ContentEnrollmentDialog(Contents.this);
                 dialog.show();
                 dialog.setCancelable(false);
-                CustomDialog_Resize(dialog, 0.9f, 0.2f);
+                CustomDialog_Resize(dialog, 0.9f, 0.3f);
                 dialog.setDialogListener(new ContentEnrollmentDialog.CustomDialogListener() {
                     @Override
                     public void PositiveClick(String Contents) {
@@ -301,11 +316,13 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                     contentsModelAdapter.notifyDataSetChanged();
                 } else {
                     if (contentsModelAdapter.getCheckedlist().size() != 0) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setMessage(contentsModelAdapter.getCheckedlist().size() + "개의 일정을 삭제 하시겠습니까?");
-                        builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                        ContentDeleteDialog contentDeleteDialog = new ContentDeleteDialog(this, contentsModelAdapter.getCheckedlist().size());
+                        contentDeleteDialog.show();
+                        contentDeleteDialog.setCancelable(false);
+                        CustomDialog_Resize(contentDeleteDialog, 0.9f, 0.2f);
+                        contentDeleteDialog.setCustomDialogListener(new ContentDeleteDialog.CustomDialogListener() {
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
+                            public void PositiveClick() {
                                 contentsModelAdapter.setCount(Clickcount);
                                 List<ContentList> list = contentsModelAdapter.getCheckedlist();
                                 for (int j = 0; j < list.size(); j++) {
@@ -315,17 +332,15 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                                 contentsModelAdapter.ClearSparseBooleanArray();
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
-                        });
-                        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
+                            public void NegativeClick() {
                                 contentsModelAdapter.setCount(Clickcount);
                                 item.setIcon(R.drawable.ic_check_24dp);
                                 contentsModelAdapter.ClearSparseBooleanArray();
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
                         });
-                        builder.show();
                     } else {
                         contentsModelAdapter.setCount(Clickcount);
                         item.setIcon(R.drawable.ic_check_24dp);

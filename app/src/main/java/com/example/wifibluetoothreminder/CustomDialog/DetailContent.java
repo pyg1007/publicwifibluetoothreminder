@@ -25,6 +25,7 @@ public class DetailContent extends Dialog implements View.OnClickListener {
 
     public interface CustomDialogListener{
         void PositiveClick();
+        void NegativeClick();
     }
 
     public DetailContent(@NonNull Context context, String Data) {
@@ -68,6 +69,7 @@ public class DetailContent extends Dialog implements View.OnClickListener {
                 dismiss();
                 break;
             case R.id.Confirm:
+                customDialogListener.NegativeClick();
                 cancel();
                 break;
         }
