@@ -21,5 +21,5 @@
 * Park Yong Geun
 * Kim Dong Sik
 
-#CopyRight
+# CopyRight
 * 이 어플리케이션에는 네이버에서 제공한 나눔글꼴이 적용되어 있습니다.
