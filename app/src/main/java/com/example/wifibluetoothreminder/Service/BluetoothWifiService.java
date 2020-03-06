@@ -224,13 +224,13 @@ public class BluetoothWifiService extends Service {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel Noti = new NotificationChannel(ChannelID, Notifi_Channel_Name, NotificationManager.IMPORTANCE_DEFAULT);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText(Content).setContentTitle(Title).setAutoCancel(true);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.mipmap.notification_foreground).setContentText(Content).setContentTitle(Title).setAutoCancel(true);
             notificationManager.createNotificationChannel(Noti);
             notificationManager.notify(Notifi_id, builder.build());
         } else {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText(Content).setContentTitle(Title).setAutoCancel(true);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.mipmap.notification_foreground).setContentText(Content).setContentTitle(Title).setAutoCancel(true);
             notificationManager.notify(Notifi_id, builder.build());
         }
     }
@@ -243,13 +243,13 @@ public class BluetoothWifiService extends Service {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel Noti = new NotificationChannel(ChannelID, Notifi_Channel_Name, NotificationManager.IMPORTANCE_DEFAULT);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText(Content).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.mipmap.notification_foreground).setContentText(Content).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName);
             notificationManager.createNotificationChannel(Noti);
             notificationManager.notify(Notifi_id, builder.build());
         } else {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentText(Content).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.mipmap.notification_foreground).setContentText(Content).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName);
             notificationManager.notify(Notifi_id, builder.build());
         }
     }
@@ -262,13 +262,13 @@ public class BluetoothWifiService extends Service {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel Noti = new NotificationChannel(ChannelID, Notifi_Channel_Name, NotificationManager.IMPORTANCE_DEFAULT);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName).setGroupSummary(true).setNumber(size);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.mipmap.notification_foreground).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName).setGroupSummary(true).setNumber(size);
             notificationManager.createNotificationChannel(Noti);
             notificationManager.notify(Notifi_id, builder.build());
         } else {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(BluetoothWifiService.this, ChannelID);
-            builder.setContentIntent(pendingIntent).setSmallIcon(R.drawable.ic_launcher_background).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName).setGroupSummary(true).setNumber(size);
+            builder.setContentIntent(pendingIntent).setSmallIcon(R.mipmap.notification_foreground).setContentTitle(Title).setAutoCancel(true).setGroup(GroupName).setGroupSummary(true).setNumber(size);
             notificationManager.notify(Notifi_id, builder.build());
         }
     }
