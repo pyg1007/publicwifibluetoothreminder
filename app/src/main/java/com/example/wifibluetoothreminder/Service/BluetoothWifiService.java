@@ -333,7 +333,7 @@ public class BluetoothWifiService extends Service {
                             String ChannelID = "ChannelId_3";
                             String ChannelName = "Bluetooth";
                             int Notification_id = 201;
-                            String Title = getNickName(device.getAddress()) + "에 등록된 메세지";
+                            String Title = getNickName(device.getAddress()) + "에 등록된 일정";
                             String GroupName = "Content_Group";
                             for (String str : Contents) {
                                 setGroupNotification(ChannelID, ChannelName, Notification_id++, 3, Title, str, GroupName);
@@ -384,7 +384,7 @@ public class BluetoothWifiService extends Service {
                                 String ChannelID = "ChannelId_3";
                                 String ChannelName = "Bluetooth";
                                 int Notification_id = 201;
-                                String Title = getNickName(bluetoothDevice.getAddress()) + "에 등록된 메세지";
+                                String Title = getNickName(bluetoothDevice.getAddress()) + "에 등록된 일정";
                                 String GroupName = "Content_Group";
                                 for (String str : Contents) {
                                     setGroupNotification(ChannelID, ChannelName, Notification_id++, 3, Title, str, GroupName);
