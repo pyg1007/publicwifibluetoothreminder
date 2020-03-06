@@ -33,7 +33,7 @@
             android:text="확인" />
 
         <View
-            android:background="#000000"
+            android:background= "#FFC8C8"
             android:layout_width="2sp"
             android:layout_height="match_parent"/>
 
