@@ -11,7 +11,8 @@
         android:id="@+id/ContentsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#EB0000" />
+        android:background="#EB0000"
+        android:theme="@style/ToolbarTheme" />
 
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/Contents_AdMob"
@@ -23,11 +24,12 @@
 
     <TextView
         android:id="@+id/Contents_Text"
-        android:text="일정이 등록되어있지 않습니다."
-        android:textSize="20sp"
-        android:gravity="center_vertical|center_horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:fontFamily="@font/nanummyeongjo"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="일정이 등록되어있지 않습니다."
+        android:textSize="20sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ContentList"

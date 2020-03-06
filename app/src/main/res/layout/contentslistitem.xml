@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
     <CheckBox
         android:id="@+id/checkbox"
-        android:paddingStart="10sp"
-        android:layout_gravity="center_vertical|center_horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:paddingStart="10sp" />
 
     <TextView
         android:id="@+id/contents"
-        android:textSize="25dp"
-        android:maxLines="1"
-        android:ellipsize="end"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="@font/nanummyeongjo"
+        android:maxLines="1"
+        android:textSize="25dp" />
 </LinearLayout>
