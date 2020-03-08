@@ -4,9 +4,11 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -34,10 +36,27 @@ public class Splash extends AppCompatActivity {
             if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED || ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_DENIED)
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_ACCESS_LOCATION);
             else if (ACCESS_COARSE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION_PERMISSION == PackageManager.PERMISSION_GRANTED) {
-                Handler handler = new Handler();
-                handler.postDelayed(new SplashHandler(), 1000);
+                if(IgnoreDose()){
+                    Handler handler = new Handler();
+                    handler.postDelayed(new SplashHandler(), 1000);
+                }
             }
         }
+    }
+
+    public boolean IgnoreDose(){
+        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
+        boolean isWhiteListing = false;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            isWhiteListing = pm.isIgnoringBatteryOptimizations(getApplicationContext().getPackageName());
+        }
+        if (!isWhiteListing) {
+            Intent intent = new Intent();
+            intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + getApplicationContext().getPackageName()));
+            startActivity(intent);
+        }
+        return isWhiteListing;
     }
 
     @Override
@@ -55,8 +74,10 @@ public class Splash extends AppCompatActivity {
                 }
             }
             if (check) {
-                Handler handler = new Handler();
-                handler.postDelayed(new SplashHandler(), 1000);
+                if(IgnoreDose()) {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new SplashHandler(), 1000);
+                }
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("권한").setMessage("해당 어플리케이션을 사용하기 위해서 필요합니다. 정말 거부하시겠습니까?");
