@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         recyclerView.addItemDecoration(new DecorationItem(4));
 
         toolbar = findViewById(R.id.MainToolbar);
-        toolbar.setTitle("와이파이/블루투스 리마인더");
+        toolbar.setTitle("기기 등록");
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
 
