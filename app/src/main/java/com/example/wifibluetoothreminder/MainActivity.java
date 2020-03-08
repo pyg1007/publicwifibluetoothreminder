@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
             }
         });
         nickNameDialog.show();
-        CustomDialog_Resize(nickNameDialog, 0.9f, 0.2f);
+        CustomDialog_Resize(nickNameDialog, 0.9f, 0.3f);
     }
 
     public void AutoService() {
@@ -319,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                         });
                         nickNameEditDialog.show();
                         nickNameEditDialog.setCancelable(false);
-                        CustomDialog_Resize(nickNameEditDialog, 0.9f, 0.2f);
+                        CustomDialog_Resize(nickNameEditDialog, 0.9f, 0.3f);
                         break;
                     case R.id.del: //삭제
                         //TODO : 딜리트문 실행
