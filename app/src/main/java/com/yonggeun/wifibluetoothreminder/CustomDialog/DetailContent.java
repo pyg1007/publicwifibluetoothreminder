@@ -23,8 +23,9 @@ public class DetailContent extends Dialog implements View.OnClickListener {
 
     public CustomDialogListener customDialogListener;
 
-    public interface CustomDialogListener{
+    public interface CustomDialogListener {
         void PositiveClick();
+
         void NegativeClick();
     }
 
@@ -33,7 +34,7 @@ public class DetailContent extends Dialog implements View.OnClickListener {
         this.ContentsData = Data;
     }
 
-    public void setListener(CustomDialogListener customDialogListener){
+    public void setListener(CustomDialogListener customDialogListener) {
         this.customDialogListener = customDialogListener;
     }
 
@@ -46,14 +47,14 @@ public class DetailContent extends Dialog implements View.OnClickListener {
         UI();
     }
 
-    public void UI(){
+    public void UI() {
         Title = findViewById(R.id.Title);
         Title.setTextColor(Color.BLACK);
         Title.setGravity(Gravity.CENTER);
         Title.setText("일정 상세 보기");
         Content = findViewById(R.id.Content);
         Content.setText(ContentsData);
-        Content.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+        Content.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
         Edit = findViewById(R.id.Edit);
         Confirm = findViewById(R.id.Confirm);
@@ -63,7 +64,7 @@ public class DetailContent extends Dialog implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.Edit:
                 customDialogListener.PositiveClick();
                 dismiss();

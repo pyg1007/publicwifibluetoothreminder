@@ -32,6 +32,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.yonggeun.wifibluetoothreminder.Adapter.MainRecyclerViewAdapter;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.Main_Content_Enrollment_Dialog;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.NickNameDialog;
@@ -45,10 +49,6 @@ import com.yonggeun.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
 import com.yonggeun.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.yonggeun.wifibluetoothreminder.ViewModel.ContentListViewModel;
 import com.yonggeun.wifibluetoothreminder.ViewModel.WifiBluetoothListViewModel;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
                         stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
                     finish();
                 } else if ("recentapps".equals(intent.getStringExtra("reason"))) {
-                    Log.e("TAG : ", "homekeyLongClick");
+
                 }
             }
         }
@@ -271,20 +271,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         }
     };
 
-    public void StartLog(String TAG, String msg) { // 빨간색로그
-        Log.e(TAG, msg);
-    }
-
-    public void StartToast(String msg) { // 토스트
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
             stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
-        Log.e("Activity : ", "onDestroy");
     }
 
 

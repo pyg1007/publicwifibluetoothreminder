@@ -46,7 +46,7 @@ public class Splash extends AppCompatActivity {
         }
     }
 
-    public void IgnoreDose(){
+    public void IgnoreDose() {
         boolean isWhiteListing = false;
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(POWER_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -57,7 +57,7 @@ public class Splash extends AppCompatActivity {
             intent.setAction(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
             intent.setData(Uri.parse("package:" + getApplicationContext().getPackageName()));
             startActivityForResult(intent, 1);
-        }else{
+        } else {
             Handler handler = new Handler();
             handler.postDelayed(new SplashHandler(), 2000);
         }
@@ -111,12 +111,11 @@ public class Splash extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1){
-            if (resultCode == RESULT_OK){
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
                 Handler handler = new Handler();
                 handler.postDelayed(new SplashHandler(), 2000);
-            }
-            else if(resultCode == RESULT_CANCELED){
+            } else if (resultCode == RESULT_CANCELED) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("권한").setMessage("이 설정을 허용하지 않으면 푸시알림이 지속적으로 오게됩니다. 정말 허용하지 않겠습니까?");
                 builder.setPositiveButton("무시", new DialogInterface.OnClickListener() {

@@ -27,8 +27,9 @@ public class ContentEditDialog extends Dialog implements View.OnClickListener {
 
     private CustomDialogListener customDialogListener;
 
-    public interface CustomDialogListener{
+    public interface CustomDialogListener {
         void PositiveClick(String Contents);
+
         void NegativeClick();
     }
 
@@ -37,7 +38,7 @@ public class ContentEditDialog extends Dialog implements View.OnClickListener {
         this.context = context;
     }
 
-    public void setCustomDialogListener(CustomDialogListener customDialogListener){
+    public void setCustomDialogListener(CustomDialogListener customDialogListener) {
         this.customDialogListener = customDialogListener;
     }
 
@@ -50,13 +51,13 @@ public class ContentEditDialog extends Dialog implements View.OnClickListener {
         UI();
     }
 
-    public void UI(){
+    public void UI() {
         Title = findViewById(R.id.Title);
         Title.setText("일정 편집");
         Title.setGravity(Gravity.CENTER);
         Title.setTextColor(Color.BLACK);
         Contents = findViewById(R.id.Content);
-        Contents.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+        Contents.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
         Edit = findViewById(R.id.Edit);
         Cancle = findViewById(R.id.Cancle);
@@ -67,12 +68,12 @@ public class ContentEditDialog extends Dialog implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.Edit:
-                if (Contents.getText().toString().length()>0){
+                if (Contents.getText().toString().length() > 0) {
                     customDialogListener.PositiveClick(Contents.getText().toString());
                     dismiss();
-                }else{
+                } else {
                     Toast.makeText(context, "일정을 입력해주세요.", Toast.LENGTH_SHORT).show();
                 }
                 break;

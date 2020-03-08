@@ -56,7 +56,7 @@ public class NickNameDialog extends Dialog implements View.OnClickListener {
         Title.setText("기기 등록");
         Title.setTextColor(Color.BLACK);
         editNickName = findViewById(R.id.NickName);
-        editNickName.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+        editNickName.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
         PositiveButton = findViewById(R.id.Enrollment);
         NegativeButton = findViewById(R.id.Cancle);

@@ -26,6 +26,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.yonggeun.wifibluetoothreminder.Adapter.ContentsModelAdapter;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.ContentDeleteDialog;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.ContentEditDialog;
@@ -35,10 +39,6 @@ import com.yonggeun.wifibluetoothreminder.Room.ContentList;
 import com.yonggeun.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
 import com.yonggeun.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.yonggeun.wifibluetoothreminder.ViewModel.ContentListViewModel;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -183,7 +183,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         stopService(new Intent(Contents.this, BluetoothWifiService.class));
                     finish();
                 } else if ("recentapps".equals(intent.getStringExtra("reason"))) {
-                    Log.e("TAG : ", "homekeyLongClick");
+
                 }
             }
         }
@@ -270,6 +270,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                     }
                 });
             }
+
             @Override
             public void NegativeClick() {
 

@@ -26,6 +26,7 @@ public class NickNameEditDialog extends Dialog implements View.OnClickListener {
 
     public interface CustomDialogListener {
         void PositiveClick(String NickName);
+
         void NegativeClick();
     }
 
@@ -46,9 +47,9 @@ public class NickNameEditDialog extends Dialog implements View.OnClickListener {
         UI();
     }
 
-    public void UI(){
+    public void UI() {
         NickName_editText = findViewById(R.id.NickName);
-        NickName_editText.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+        NickName_editText.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
         Title = findViewById(R.id.Title);
         Title.setTextColor(Color.BLACK);
         Title.setText("별명 변경");
@@ -63,7 +64,7 @@ public class NickNameEditDialog extends Dialog implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.Change:
                 customDialogListener.PositiveClick(NickName_editText.getText().toString());
                 dismiss();

@@ -22,12 +22,13 @@ public class ContentDeleteDialog extends Dialog implements View.OnClickListener 
     private Button Delete, Cancle;
     private CustomDialogListener customDialogListener;
 
-    public interface CustomDialogListener{
+    public interface CustomDialogListener {
         void PositiveClick();
+
         void NegativeClick();
     }
 
-    public void setCustomDialogListener(CustomDialogListener customDialogListener){
+    public void setCustomDialogListener(CustomDialogListener customDialogListener) {
         this.customDialogListener = customDialogListener;
     }
 
@@ -46,10 +47,10 @@ public class ContentDeleteDialog extends Dialog implements View.OnClickListener 
         UI();
     }
 
-    public void UI(){
+    public void UI() {
         Message = findViewById(R.id.Message);
         Message.setText(num + "개의 일정이 선택되었습니다.\n삭제하시겠습니까?");
-        Message.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+        Message.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
         Delete = findViewById(R.id.Delete);
         Cancle = findViewById(R.id.Cancle);
@@ -60,7 +61,7 @@ public class ContentDeleteDialog extends Dialog implements View.OnClickListener 
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.Delete:
                 customDialogListener.PositiveClick();
                 dismiss();

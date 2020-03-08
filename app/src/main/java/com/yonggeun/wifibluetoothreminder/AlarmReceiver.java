@@ -14,7 +14,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
-        Log.e("TAG : ", "AlarmReceiver");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Intent in = new Intent(context, RestartService.class);
             context.startForegroundService(in);
