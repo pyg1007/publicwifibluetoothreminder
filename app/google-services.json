@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:543265269875:android:33c0dbaae9acbcddf4a206",
+        "mobilesdk_app_id": "1:543265269875:android:6ef48a38031ee50ff4a206",
         "android_client_info": {
-          "package_name": "com.example.wifibluetoothreminder"
+          "package_name": "com.yonggeun.wifibluetoothreminder"
         }
       },
       "oauth_client": [
         {
-          "client_id": "543265269875-71u852hdftsn7mqpoopu5bg344vuq8ib.apps.googleusercontent.com",
+          "client_id": "543265269875-ns65p94nspf0tocbnec0as3qs13n3fpe.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.wifibluetoothreminder",
+            "package_name": "com.yonggeun.wifibluetoothreminder",
             "certificate_hash": "a365295dba8acd333a8f4185a2fae135d748db98"
           }
         },
