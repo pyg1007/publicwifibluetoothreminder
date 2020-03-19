@@ -30,13 +30,14 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.yonggeun.wifibluetoothreminder.Adapter.ContentsModelAdapter;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.ContentDeleteDialog;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.ContentEditDialog;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.ContentEnrollmentDialog;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.DetailContent;
 import com.yonggeun.wifibluetoothreminder.Room.ContentList;
-import com.yonggeun.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
 import com.yonggeun.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.yonggeun.wifibluetoothreminder.ViewModel.ContentListViewModel;
 
@@ -51,12 +52,9 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
     private TextView CenterText;
     private String Mac, SSID, NickName;
     private List<ContentList> items;
-    private RecyclerView recyclerView;
-    private Toolbar toolbar;
     private ContentsModelAdapter contentsModelAdapter;
-    private int Clickcount = 0;
+    private int Click_count = 0;
 
-    private ServiceRunningCheck serviceRunningCheck;
     private ContentListViewModel contentListViewModel;
 
 
@@ -92,8 +90,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
         items = new ArrayList<>();
 
-        serviceRunningCheck = new ServiceRunningCheck(this);
-        recyclerView = findViewById(R.id.ContentList);
+        RecyclerView recyclerView = findViewById(R.id.ContentList);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
@@ -103,7 +100,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         contentsModelAdapter = new ContentsModelAdapter(items, Contents.this, Contents.this);
         recyclerView.setAdapter(contentsModelAdapter);
 
-        toolbar = findViewById(R.id.ContentsToolbar);
+        Toolbar toolbar = findViewById(R.id.ContentsToolbar);
         toolbar.setTitle(NickName + "의 일정");
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
@@ -113,7 +110,12 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
         CenterText = findViewById(R.id.Contents_Text);
 
-        MobileAds.initialize(this, getString(R.string.admob_app_id));
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+
+            }
+        });
         adView = findViewById(R.id.Contents_AdMob);
 
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -179,7 +181,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
         public void onReceive(Context context, Intent intent) {
             if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())) {
                 if ("homekey".equals(intent.getStringExtra("reason"))) {
-                    if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
+                    if (BluetoothWifiService.ServiceIntent != null)
                         stopService(new Intent(Contents.this, BluetoothWifiService.class));
                     finish();
                 } else if ("recentapps".equals(intent.getStringExtra("reason"))) {
@@ -308,10 +310,10 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                 });
                 return true;
             case R.id.Select:
-                Clickcount++;
-                if (Clickcount % 2 == 1) {
+                Click_count++;
+                if (Click_count % 2 == 1) {
                     item.setIcon(R.drawable.ic_delete_24dp);
-                    contentsModelAdapter.setCount(Clickcount);
+                    contentsModelAdapter.setCount(Click_count);
                     contentsModelAdapter.notifyDataSetChanged();
                 } else {
                     if (contentsModelAdapter.getCheckedlist().size() != 0) {
@@ -322,7 +324,7 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
                         contentDeleteDialog.setCustomDialogListener(new ContentDeleteDialog.CustomDialogListener() {
                             @Override
                             public void PositiveClick() {
-                                contentsModelAdapter.setCount(Clickcount);
+                                contentsModelAdapter.setCount(Click_count);
                                 List<ContentList> list = contentsModelAdapter.getCheckedlist();
                                 for (int j = 0; j < list.size(); j++) {
                                     contentListViewModel.Delete(list.get(j).ID, list.get(j).getContent());
@@ -334,14 +336,14 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
                             @Override
                             public void NegativeClick() {
-                                contentsModelAdapter.setCount(Clickcount);
+                                contentsModelAdapter.setCount(Click_count);
                                 item.setIcon(R.drawable.ic_check_24dp);
                                 contentsModelAdapter.ClearSparseBooleanArray();
                                 contentsModelAdapter.notifyDataSetChanged();
                             }
                         });
                     } else {
-                        contentsModelAdapter.setCount(Clickcount);
+                        contentsModelAdapter.setCount(Click_count);
                         item.setIcon(R.drawable.ic_check_24dp);
                         contentsModelAdapter.notifyDataSetChanged();
                     }

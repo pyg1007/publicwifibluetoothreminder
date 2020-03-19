@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +35,8 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.yonggeun.wifibluetoothreminder.Adapter.MainRecyclerViewAdapter;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.Main_Content_Enrollment_Dialog;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.NickNameDialog;
@@ -45,7 +46,6 @@ import com.yonggeun.wifibluetoothreminder.Room.ContentListDao;
 import com.yonggeun.wifibluetoothreminder.Room.ListDatabase;
 import com.yonggeun.wifibluetoothreminder.Room.WifiBluetoothList;
 import com.yonggeun.wifibluetoothreminder.Room.WifiBluetoothListDao;
-import com.yonggeun.wifibluetoothreminder.RunningCheck.ServiceRunningCheck;
 import com.yonggeun.wifibluetoothreminder.Service.BluetoothWifiService;
 import com.yonggeun.wifibluetoothreminder.ViewModel.ContentListViewModel;
 import com.yonggeun.wifibluetoothreminder.ViewModel.WifiBluetoothListViewModel;
@@ -61,13 +61,10 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public List<WifiBluetoothList> list;
     public RecyclerView recyclerView;
     public MainRecyclerViewAdapter mainRecyclerViewAdapter;
-    private Toolbar toolbar;
     private TextView MainText;
 
     private WifiBluetoothListViewModel wifiBluetoothListViewModel;
     private ContentListViewModel contentListViewModel;
-    private ServiceRunningCheck serviceRunningCheck;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         public void onReceive(Context context, Intent intent) {
             if (Intent.ACTION_CLOSE_SYSTEM_DIALOGS.equals(intent.getAction())) {
                 if ("homekey".equals(intent.getStringExtra("reason"))) {
-                    if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
+                    if (BluetoothWifiService.ServiceIntent != null)
                         stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
                     finish();
                 } else if ("recentapps".equals(intent.getStringExtra("reason"))) {
@@ -130,8 +127,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     public void UI() { //UI들 여기 작성
 
         list = new ArrayList<>();
-        serviceRunningCheck = new ServiceRunningCheck(this);
-        //TODO : recyclerView Init
+
         recyclerView = findViewById(R.id.WIFINameList);
         recyclerView.setHasFixedSize(true);
 
@@ -143,16 +139,20 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         recyclerView.addItemDecoration(new DecorationItem(4));
 
-        toolbar = findViewById(R.id.MainToolbar);
-        toolbar.setTitle("기기 등록");
+        Toolbar toolbar = findViewById(R.id.MainToolbar);
+        toolbar.setTitle(R.string.MainToolbar);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
 
         MainText = findViewById(R.id.Center_Text);
 
-        MobileAds.initialize(this, getString(R.string.admob_app_id));
-        adView = findViewById(R.id.Main_AdMob);
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
 
+        adView = findViewById(R.id.Main_AdMob);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
         AdmobTest();
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     }
 
     public void AutoService() {
-        if (!serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService")) {
+        if (BluetoothWifiService.ServiceIntent == null) {
             Intent intent = new Intent(MainActivity.this, BluetoothWifiService.class);
             startService(intent);
         } else {
@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (serviceRunningCheck.RunningCheck("com.example.wifibluetoothreminder.Service.BluetoothWifiService"))
+        if (BluetoothWifiService.ServiceIntent != null)
             stopService(new Intent(MainActivity.this, BluetoothWifiService.class));
     }
 
@@ -353,9 +353,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 100:
-                    mainRecyclerViewAdapter.notifyDataSetChanged();
+            if (msg.what == 100) {
+                mainRecyclerViewAdapter.notifyDataSetChanged();
             }
         }
     };
@@ -368,38 +367,36 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.Add:
-                ArrayList<String> ssid_List = new ArrayList<>();
-                for (int i = 0; i < list.size(); i++) {
-                    ssid_List.add(list.get(i).getNickName());
-                }
-                if (ssid_List.size() != 0) {
-                    Main_Content_Enrollment_Dialog main_content_enrollment_dialog = new Main_Content_Enrollment_Dialog(MainActivity.this, ssid_List);
-                    main_content_enrollment_dialog.setCancelable(false);
-                    main_content_enrollment_dialog.setDialogListener(new Main_Content_Enrollment_Dialog.CustomDialogListener() {
-                        @Override
-                        public void PositiveClick(String Content, int position) {
-                            contentListViewModel.Insert(new ContentList(list.get(position).getMac(), list.get(position).getSSID(), Content));
-                            wifiBluetoothListViewModel.updateCount(list.get(position).getMac(), list.get(position).getCount() + 1);
-                            mainRecyclerViewAdapter.notifyDataSetChanged();
-                        }
+        if (item.getItemId() == R.id.Add) {
+            ArrayList<String> ssid_List = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                ssid_List.add(list.get(i).getNickName());
+            }
+            if (ssid_List.size() != 0) {
+                Main_Content_Enrollment_Dialog main_content_enrollment_dialog = new Main_Content_Enrollment_Dialog(MainActivity.this, ssid_List);
+                main_content_enrollment_dialog.setCancelable(false);
+                main_content_enrollment_dialog.setDialogListener(new Main_Content_Enrollment_Dialog.CustomDialogListener() {
+                    @Override
+                    public void PositiveClick(String Content, int position) {
+                        contentListViewModel.Insert(new ContentList(list.get(position).getMac(), list.get(position).getSSID(), Content));
+                        wifiBluetoothListViewModel.updateCount(list.get(position).getMac(), list.get(position).getCount() + 1);
+                        mainRecyclerViewAdapter.notifyDataSetChanged();
+                    }
 
-                        @Override
-                        public void NegativeClick() {
+                    @Override
+                    public void NegativeClick() {
 
-                        }
-                    });
-                    main_content_enrollment_dialog.show();
-                    CustomDialog_Resize(main_content_enrollment_dialog, 0.9f, 0.3f);
-                } else {
-                    Intent intent = new Intent("Activity_to_Service");
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+                    }
+                });
+                main_content_enrollment_dialog.show();
+                CustomDialog_Resize(main_content_enrollment_dialog, 0.9f, 0.3f);
+            } else {
+                Intent intent = new Intent("Activity_to_Service");
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            }
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public void CustomDialog_Resize(Dialog dialog, float horizontal, float vertical) {

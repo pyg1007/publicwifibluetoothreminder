@@ -20,10 +20,7 @@ import com.yonggeun.wifibluetoothreminder.R;
 public class NickNameDialog extends Dialog implements View.OnClickListener {
 
 
-    private TextView Title;
     private EditText editNickName;
-    private Button PositiveButton;
-    private Button NegativeButton;
 
     public CustomDialogListener customDialogListener;
 
@@ -51,18 +48,18 @@ public class NickNameDialog extends Dialog implements View.OnClickListener {
     }
 
     public void UI() {
-        Title = findViewById(R.id.Title);
-        Title.setGravity(Gravity.CENTER);
-        Title.setText("기기 등록");
-        Title.setTextColor(Color.BLACK);
+        TextView title = findViewById(R.id.Title);
+        title.setGravity(Gravity.CENTER);
+        title.setText("기기 등록");
+        title.setTextColor(Color.BLACK);
         editNickName = findViewById(R.id.NickName);
         editNickName.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
-        PositiveButton = findViewById(R.id.Enrollment);
-        NegativeButton = findViewById(R.id.Cancle);
+        Button positiveButton = findViewById(R.id.Enrollment);
+        Button negativeButton = findViewById(R.id.Cancle);
 
-        PositiveButton.setOnClickListener(this);
-        NegativeButton.setOnClickListener(this);
+        positiveButton.setOnClickListener(this);
+        negativeButton.setOnClickListener(this);
     }
 
     @Override

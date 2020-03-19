@@ -87,8 +87,7 @@ public class ContentsModelAdapter extends RecyclerView.Adapter<ContentsModelAdap
 
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.contentslistitem, parent, false);
-        CustomViewHolder customViewHolder = new CustomViewHolder(view);
-        return customViewHolder;
+        return new CustomViewHolder(view);
     }
 
     @Override

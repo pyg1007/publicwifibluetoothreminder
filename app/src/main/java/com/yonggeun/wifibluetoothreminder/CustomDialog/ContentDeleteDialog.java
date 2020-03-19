@@ -17,9 +17,7 @@ import com.yonggeun.wifibluetoothreminder.R;
 
 public class ContentDeleteDialog extends Dialog implements View.OnClickListener {
 
-    private TextView Message;
     private int num;
-    private Button Delete, Cancle;
     private CustomDialogListener customDialogListener;
 
     public interface CustomDialogListener {
@@ -48,15 +46,15 @@ public class ContentDeleteDialog extends Dialog implements View.OnClickListener 
     }
 
     public void UI() {
-        Message = findViewById(R.id.Message);
-        Message.setText(num + "개의 일정이 선택되었습니다.\n삭제하시겠습니까?");
-        Message.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+        TextView message = findViewById(R.id.Message);
+        message.setText(num + "개의 일정이 선택되었습니다.\n삭제하시겠습니까?");
+        message.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
-        Delete = findViewById(R.id.Delete);
-        Cancle = findViewById(R.id.Cancle);
+        Button delete = findViewById(R.id.Delete);
+        Button cancle = findViewById(R.id.Cancle);
 
-        Delete.setOnClickListener(this);
-        Cancle.setOnClickListener(this);
+        delete.setOnClickListener(this);
+        cancle.setOnClickListener(this);
     }
 
     @Override

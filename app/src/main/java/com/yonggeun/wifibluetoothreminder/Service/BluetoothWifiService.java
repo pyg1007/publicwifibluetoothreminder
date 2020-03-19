@@ -46,6 +46,7 @@ public class BluetoothWifiService extends Service {
     private boolean isEnableWifi = false;
     private boolean isEnableBluetooth = false;
     private boolean isRestarted = false;
+    public static Intent ServiceIntent = null;
 
     private String BluetoothMacAddress;
     private String BluetoothSSID;
@@ -54,6 +55,8 @@ public class BluetoothWifiService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        ServiceIntent = intent;
 
         isRestarted = intent.getBooleanExtra("ReStarted", false);
 
@@ -90,7 +93,7 @@ public class BluetoothWifiService extends Service {
                 break;
             }
         }
-        return check;
+        return !check;
     }
 
     public List<String> isContentExist(final String Mac) {
@@ -128,8 +131,7 @@ public class BluetoothWifiService extends Service {
     public String getWifiMacName() {
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = wifiManager.getConnectionInfo();
-        String Mac = info.getMacAddress();
-        return Mac;
+        return info.getMacAddress();
     }
 
     public String getNickName(final String Mac) {
@@ -169,7 +171,7 @@ public class BluetoothWifiService extends Service {
             @Override
             public void onAvailable(Network network) {
                 isEnableWifi = true;
-                if (!isExist(getWifiMacName())) {
+                if (isExist(getWifiMacName())) {
                     if (ForeGround.get().isBackGround() || isRestarted) {
                         Toast.makeText(BluetoothWifiService.this, String.valueOf(ForeGround.get().isBackGround()) + isRestarted, Toast.LENGTH_SHORT).show();
                         String ChannelID = "ChannelID_1";
@@ -278,19 +280,19 @@ public class BluetoothWifiService extends Service {
         notificationManager.cancel(Notify_id);
     }
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ("Activity_to_Service".equals(intent.getAction())) { // 어플 메인엑티비티 진입시 받는 리시버
                 isRestarted = false;
-                if (isEnableWifi && !isExist(getWifiMacName())) {
+                if (isEnableWifi && isExist(getWifiMacName())) {
                     Log.e("Mac", getWifiMacName());
                     Intent action = new Intent("Service_to_Activity");
                     action.putExtra("DeviceType", "Wifi");
                     action.putExtra("Mac", getWifiMacName());
                     action.putExtra("SSID", getWifiName());
                     LocalBroadcastManager.getInstance(context).sendBroadcast(action);
-                } else if (isEnableBluetooth && !isExist(BluetoothMacAddress) && BluetoothMacAddress != null) {
+                } else if (isEnableBluetooth && isExist(BluetoothMacAddress) && BluetoothMacAddress != null) {
                     Intent action = new Intent("Service_to_Activity");
                     action.putExtra("DeviceType", "Bluetooth");
                     action.putExtra("Mac", BluetoothMacAddress);
@@ -305,12 +307,12 @@ public class BluetoothWifiService extends Service {
         }
     };
 
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(intent.getAction())) { // 연결될 때 감지
-                if (!isExist(device.getAddress())) {
+                if (isExist(device.getAddress())) {
                     if (!ForeGround.get().isBackGround() || !isRestarted) {
                         Intent action = new Intent("Service_to_Activity");
                         action.putExtra("DeviceType", "Bluetooth");
@@ -361,7 +363,7 @@ public class BluetoothWifiService extends Service {
                     isEnableBluetooth = true;
                     BluetoothMacAddress = bluetoothDevice.getAddress();
                     BluetoothSSID = bluetoothDevice.getName();
-                    if (!isExist(bluetoothDevice.getAddress())) {
+                    if (isExist(bluetoothDevice.getAddress())) {
                         if (!ForeGround.get().isBackGround()) {
                             Intent action = new Intent("Service_to_Activity");
                             action.putExtra("DeviceType", "Bluetooth");
@@ -406,8 +408,7 @@ public class BluetoothWifiService extends Service {
     public boolean isConnected(BluetoothDevice device) {
         try {
             Method m = device.getClass().getMethod("isConnected", (Class[]) null);
-            boolean connected = (boolean) m.invoke(device, (Object[]) null);
-            return connected;
+            return (boolean) m.invoke(device, (Object[]) null);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -417,6 +418,7 @@ public class BluetoothWifiService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.e("TAG : ", "onDestroy");
+        ServiceIntent = null;
         setAlarmTimer();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         unregisterReceiver(mBroadcastReceiver);
@@ -463,6 +465,7 @@ public class BluetoothWifiService extends Service {
 
         setAlarmTimer();
         Log.e("TAG : ", "onTaskRemoved");
+        ServiceIntent = null;
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         unregisterReceiver(mBroadcastReceiver);
     }

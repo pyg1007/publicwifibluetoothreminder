@@ -58,8 +58,10 @@
 
         <activity android:name="com.yonggeun.wifibluetoothreminder.CustomDialog.ContentEnrollmentDialog" />
         <activity android:name="com.yonggeun.wifibluetoothreminder.CustomDialog.NickNameDialog" />
-        <activity android:name="com.yonggeun.wifibluetoothreminder.Contents" />
-        <activity android:name="com.yonggeun.wifibluetoothreminder.MainActivity" />
+        <activity android:name="com.yonggeun.wifibluetoothreminder.Contents"
+            android:windowSoftInputMode="adjustNothing"/>
+        <activity android:name="com.yonggeun.wifibluetoothreminder.MainActivity"
+            android:windowSoftInputMode="adjustNothing"/>
     </application>
 
 </manifest>

@@ -17,8 +17,6 @@ import com.yonggeun.wifibluetoothreminder.R;
 
 public class DetailContent extends Dialog implements View.OnClickListener {
 
-    private TextView Title, Content;
-    private Button Edit, Confirm;
     private String ContentsData;
 
     public CustomDialogListener customDialogListener;
@@ -48,18 +46,18 @@ public class DetailContent extends Dialog implements View.OnClickListener {
     }
 
     public void UI() {
-        Title = findViewById(R.id.Title);
-        Title.setTextColor(Color.BLACK);
-        Title.setGravity(Gravity.CENTER);
-        Title.setText("일정 상세 보기");
-        Content = findViewById(R.id.Content);
-        Content.setText(ContentsData);
-        Content.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+        TextView title = findViewById(R.id.Title);
+        title.setTextColor(Color.BLACK);
+        title.setGravity(Gravity.CENTER);
+        title.setText("일정 상세 보기");
+        TextView content = findViewById(R.id.Content);
+        content.setText(ContentsData);
+        content.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
-        Edit = findViewById(R.id.Edit);
-        Confirm = findViewById(R.id.Confirm);
-        Edit.setOnClickListener(this);
-        Confirm.setOnClickListener(this);
+        Button edit = findViewById(R.id.Edit);
+        Button confirm = findViewById(R.id.Confirm);
+        edit.setOnClickListener(this);
+        confirm.setOnClickListener(this);
     }
 
     @Override

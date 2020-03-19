@@ -21,9 +21,7 @@ public class ContentEditDialog extends Dialog implements View.OnClickListener {
 
     private Context context;
 
-    private TextView Title;
     private EditText Contents;
-    private Button Edit, Cancle;
 
     private CustomDialogListener customDialogListener;
 
@@ -52,18 +50,18 @@ public class ContentEditDialog extends Dialog implements View.OnClickListener {
     }
 
     public void UI() {
-        Title = findViewById(R.id.Title);
-        Title.setText("일정 편집");
-        Title.setGravity(Gravity.CENTER);
-        Title.setTextColor(Color.BLACK);
+        TextView title = findViewById(R.id.Title);
+        title.setText("일정 편집");
+        title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.BLACK);
         Contents = findViewById(R.id.Content);
         Contents.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
-        Edit = findViewById(R.id.Edit);
-        Cancle = findViewById(R.id.Cancle);
+        Button edit = findViewById(R.id.Edit);
+        Button cancle = findViewById(R.id.Cancle);
 
-        Edit.setOnClickListener(this);
-        Cancle.setOnClickListener(this);
+        edit.setOnClickListener(this);
+        cancle.setOnClickListener(this);
     }
 
     @Override

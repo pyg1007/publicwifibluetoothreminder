@@ -80,9 +80,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         Context context = parent.getContext();
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.mainlistitem, parent, false);
-        CoustomViewHolder coustomViewHolder = new CoustomViewHolder(view);
 
-        return coustomViewHolder;
+        return new CoustomViewHolder(view);
     }
 
     @Override

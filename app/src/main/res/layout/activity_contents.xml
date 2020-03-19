@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".Contents">
 
     <androidx.appcompat.widget.Toolbar
@@ -14,27 +12,30 @@
         android:background="#EB0000"
         android:theme="@style/ToolbarTheme" />
 
-    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/Contents_AdMob"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|center_vertical"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/admob_banner_unit_id" />
-
     <TextView
         android:id="@+id/Contents_Text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fontFamily="@font/nanummyeongjo"
         android:gravity="center_vertical|center_horizontal"
-        android:text="일정이 등록되어있지 않습니다."
+        android:text="@string/No_Schedule"
         android:textSize="20sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ContentList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/Contents_AdMob"
+        android:layout_below="@id/ContentsToolbar"
         android:clipToPadding="false" />
 
-</LinearLayout>
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/Contents_AdMob"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/admob_banner_unit_id" />
+
+</RelativeLayout>

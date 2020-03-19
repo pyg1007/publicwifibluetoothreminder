@@ -32,13 +32,13 @@ public class ForeGround implements Application.ActivityLifecycleCallbacks {
     }
 
     public boolean isBackGround() {
-        return mAppStatus.ordinal() == mAppStatus.BACKGROUND.ordinal();
+        return mAppStatus.ordinal() == AppStatus.BACKGROUND.ordinal();
     }
 
     public enum AppStatus {
         BACKGROUND, // app is background
         RETURNED_TO_FOREGROUND, // app returned to foreground(or first launch)
-        FOREGROUND; // app is foreground
+        FOREGROUND // app is foreground
     }
 
 

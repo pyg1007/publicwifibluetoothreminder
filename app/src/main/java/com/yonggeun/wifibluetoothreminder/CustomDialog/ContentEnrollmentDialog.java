@@ -21,10 +21,7 @@ public class ContentEnrollmentDialog extends Dialog implements View.OnClickListe
 
     private Context context;
 
-    private TextView textView;
     private EditText Content;
-    private Button PositiveButton;
-    private Button NegativeButton;
 
     public CustomDialogListener customDialogListener;
 
@@ -40,16 +37,16 @@ public class ContentEnrollmentDialog extends Dialog implements View.OnClickListe
     public void UI() {
         Content = findViewById(R.id.Content);
         Content.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
-        textView = findViewById(R.id.Content_Dialog_Title);
+        TextView textView = findViewById(R.id.Content_Dialog_Title);
         textView.setText("일정등록");
         textView.setGravity(Gravity.CENTER);
         textView.setTextColor(Color.BLACK);
 
-        PositiveButton = findViewById(R.id.Enrollment);
-        NegativeButton = findViewById(R.id.Cancle);
+        Button positiveButton = findViewById(R.id.Enrollment);
+        Button negativeButton = findViewById(R.id.Cancle);
 
-        PositiveButton.setOnClickListener(this);
-        NegativeButton.setOnClickListener(this);
+        positiveButton.setOnClickListener(this);
+        negativeButton.setOnClickListener(this);
     }
 
     public interface CustomDialogListener {

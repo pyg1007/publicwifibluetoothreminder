@@ -26,10 +26,7 @@ public class Main_Content_Enrollment_Dialog extends Dialog implements View.OnCli
 
     private Context context;
 
-    private TextView NickName_Text, Title, Schedule;
     private EditText Schedule_Edit;
-    private Button Enrollment, Cancle;
-    private Spinner NickName_Spinner;
     private List<String> NickName;
 
     private int Position;
@@ -62,27 +59,27 @@ public class Main_Content_Enrollment_Dialog extends Dialog implements View.OnCli
     }
 
     public void UI() {
-        NickName_Text = findViewById(R.id.NickName_Text);
-        Title = findViewById(R.id.Title);
-        Title.setTextColor(Color.BLACK);
-        Title.setGravity(Gravity.CENTER);
-        Title.setText("일정 등록");
+        TextView nickName_Text = findViewById(R.id.NickName_Text);
+        TextView title = findViewById(R.id.Title);
+        title.setTextColor(Color.BLACK);
+        title.setGravity(Gravity.CENTER);
+        title.setText("일정 등록");
 
-        Schedule = findViewById(R.id.Schedule);
+        TextView schedule = findViewById(R.id.Schedule);
 
-        Enrollment = findViewById(R.id.Enrollment);
-        Cancle = findViewById(R.id.Cancle);
+        Button enrollment = findViewById(R.id.Enrollment);
+        Button cancle = findViewById(R.id.Cancle);
 
-        Enrollment.setOnClickListener(this);
-        Cancle.setOnClickListener(this);
+        enrollment.setOnClickListener(this);
+        cancle.setOnClickListener(this);
 
         Schedule_Edit = findViewById(R.id.Schedule_Edit);
         Schedule_Edit.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
-        NickName_Spinner = findViewById(R.id.NickName_Spinner);
+        Spinner nickName_Spinner = findViewById(R.id.NickName_Spinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, NickName);
-        NickName_Spinner.setAdapter(adapter);
-        NickName_Spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        nickName_Spinner.setAdapter(adapter);
+        nickName_Spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 Position = i;

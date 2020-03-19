@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".MainActivity">
+
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/MainToolbar"
@@ -14,28 +13,31 @@
         android:background="#EB0000"
         android:theme="@style/ToolbarTheme" />
 
-    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/Main_AdMob"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|center_vertical"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/admob_banner_unit_id" />
-
     <TextView
         android:id="@+id/Center_Text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fontFamily="@font/nanummyeongjo"
         android:gravity="center_horizontal|center_vertical"
-        android:text="등록된 기기가 없습니다."
+        android:text="@string/No_Device"
         android:textSize="20sp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/WIFINameList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:layout_above="@id/Main_AdMob"
+        android:layout_below="@id/MainToolbar" />
 
 
-    </androidx.recyclerview.widget.RecyclerView>
-</LinearLayout>
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/Main_AdMob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center_horizontal|center_vertical"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/admob_banner_unit_id" />
+
+</RelativeLayout>
