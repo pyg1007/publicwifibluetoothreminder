@@ -399,6 +399,11 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
     public void CustomDialog_Resize(Dialog dialog, float horizontal, float vertical) {
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
