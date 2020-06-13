@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "870d83b0a58fba72242288d0f56c543a",
+    "identityHash": "e67fe3f73b029e1256b0fa972eaf5f3b",
     "entities": [
       {
         "tableName": "wb_table",
@@ -50,31 +50,31 @@
       },
       {
         "tableName": "Content_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `Mac` TEXT NOT NULL, `Content_SSID` TEXT NOT NULL, `Content` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ID` INTEGER PRIMARY KEY AUTOINCREMENT, `Mac` TEXT, `Content_SSID` TEXT, `Content` TEXT)",
         "fields": [
           {
             "fieldPath": "ID",
             "columnName": "ID",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "Mac",
             "columnName": "Mac",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "Content_SSID",
             "columnName": "Content_SSID",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "Content",
             "columnName": "Content",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -90,7 +90,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '870d83b0a58fba72242288d0f56c543a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e67fe3f73b029e1256b0fa972eaf5f3b')"
     ]
   }
 }

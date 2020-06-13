@@ -414,6 +414,8 @@ public class MainActivity extends AppCompatActivity implements MainRecyclerViewA
         int x = (int) (size.x * horizontal);
         int y = (int) (size.y * vertical);
 
-        window.setLayout(x, y);
+        if (window != null) {
+            window.setLayout(x, y);
+        }
     }
 }

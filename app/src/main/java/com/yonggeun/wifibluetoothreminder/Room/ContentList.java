@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "Content_table")
 public class ContentList {
 
-    @NonNull
+
     @PrimaryKey(autoGenerate = true)
     public Integer ID;
 
