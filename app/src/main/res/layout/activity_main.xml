@@ -10,14 +10,12 @@
         android:id="@+id/MainToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#EB0000"
-        android:theme="@style/ToolbarTheme" />
+        android:background="#EB0000" />
 
     <TextView
         android:id="@+id/Center_Text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fontFamily="@font/nanummyeongjo"
         android:gravity="center_horizontal|center_vertical"
         android:text="@string/No_Device"
         android:textSize="20sp" />
@@ -27,17 +25,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:layout_above="@id/Main_AdMob"
-        android:layout_below="@id/MainToolbar" />
+        android:layout_below="@id/MainToolbar"/>
+<!--        android:layout_above="@id/Main_AdMob"/>-->
 
 
-    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/Main_AdMob"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="center_horizontal|center_vertical"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/admob_banner_unit_id" />
+<!--    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"-->
+<!--        android:id="@+id/Main_AdMob"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_gravity="center_horizontal|center_vertical"-->
+<!--        ads:adSize="BANNER"-->
+<!--        ads:adUnitId="admob_banner_unit_id" />-->
 
 </RelativeLayout>

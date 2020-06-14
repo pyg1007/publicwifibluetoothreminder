@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
@@ -26,12 +25,10 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+//import com.google.android.gms.ads.AdView;
+//import com.google.android.gms.ads.MobileAds;
+//import com.google.android.gms.ads.initialization.InitializationStatus;
+//import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.yonggeun.wifibluetoothreminder.Adapter.ContentsModelAdapter;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.ContentDeleteDialog;
 import com.yonggeun.wifibluetoothreminder.CustomDialog.ContentEditDialog;
@@ -47,7 +44,7 @@ import java.util.List;
 public class Contents extends AppCompatActivity implements ContentsModelAdapter.OnListItemClickInterface, ContentsModelAdapter.OnListItemLongClickInterface {
 
     //google Admob관련
-    private AdView adView;
+//    private AdView adView;
 
     private TextView CenterText;
     private String Mac, SSID, NickName;
@@ -110,58 +107,58 @@ public class Contents extends AppCompatActivity implements ContentsModelAdapter.
 
         CenterText = findViewById(R.id.Contents_Text);
 
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-
-            }
-        });
-        adView = findViewById(R.id.Contents_AdMob);
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-        AdmobTest();
+//        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+//            @Override
+//            public void onInitializationComplete(InitializationStatus initializationStatus) {
+//
+//            }
+//        });
+//        adView = findViewById(R.id.Contents_AdMob);
+//
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        adView.loadAd(adRequest);
+//        AdmobTest();
     }
 
-    public void AdmobTest() {
-        adView.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                super.onAdClosed();
-                Log.e("onAdClosed", "onAdClosed");
-            }
-
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-                Log.e("onAdFailedToLoad", "onAdFailedToLoad" + i);
-            }
-
-            @Override
-            public void onAdLeftApplication() {
-                super.onAdLeftApplication();
-                Log.e("onAdLeftApplication", "onAdLeftApplication");
-            }
-
-            @Override
-            public void onAdOpened() {
-                super.onAdOpened();
-                Log.e("onAdOpened", "onAdOpened");
-            }
-
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                Log.e("onAdLoaded", "onAdLoaded");
-            }
-
-            @Override
-            public void onAdClicked() {
-                super.onAdClicked();
-                Log.e("onAdClicked", "onAdClicked");
-            }
-        });
-    }
+//    public void AdmobTest() {
+//        adView.setAdListener(new AdListener() {
+//            @Override
+//            public void onAdClosed() {
+//                super.onAdClosed();
+//                Log.e("onAdClosed", "onAdClosed");
+//            }
+//
+//            @Override
+//            public void onAdFailedToLoad(int i) {
+//                super.onAdFailedToLoad(i);
+//                Log.e("onAdFailedToLoad", "onAdFailedToLoad" + i);
+//            }
+//
+//            @Override
+//            public void onAdLeftApplication() {
+//                super.onAdLeftApplication();
+//                Log.e("onAdLeftApplication", "onAdLeftApplication");
+//            }
+//
+//            @Override
+//            public void onAdOpened() {
+//                super.onAdOpened();
+//                Log.e("onAdOpened", "onAdOpened");
+//            }
+//
+//            @Override
+//            public void onAdLoaded() {
+//                super.onAdLoaded();
+//                Log.e("onAdLoaded", "onAdLoaded");
+//            }
+//
+//            @Override
+//            public void onAdClicked() {
+//                super.onAdClicked();
+//                Log.e("onAdClicked", "onAdClicked");
+//            }
+//        });
+//    }
 
     @Override
     protected void onPause() {

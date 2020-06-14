@@ -8,8 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:fontFamily">@font/nanummyeongjo</item>
-    </style>
+<!--    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">-->
+<!--        <item name="android:fontFamily">@font/nanummyeongjo</item>-->
+<!--    </style>-->
 
 </resources>

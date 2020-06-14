@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'
 // Apply the Crashlytics Gradle plugin
-apply plugin: 'com.google.firebase.crashlytics'
+//apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion 28
@@ -50,7 +50,7 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
-    implementation 'com.google.android.gms:play-services-ads:19.0.1'
+//    implementation 'com.google.android.gms:play-services-ads:19.0.1'
 
     //Room
     implementation 'androidx.room:room-runtime:2.2.5'
@@ -62,8 +62,8 @@ dependencies {
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.2.0"
 
     //Remote-config
-    implementation 'com.google.firebase:firebase-analytics:17.2.3'
-    implementation 'com.google.firebase:firebase-crashlytics:17.0.0-beta02'
+//    implementation 'com.google.firebase:firebase-analytics:17.2.3'
+//    implementation 'com.google.firebase:firebase-crashlytics:17.0.0-beta02'
 
-    implementation 'org.jsoup:jsoup:1.11.3'
+//    implementation 'org.jsoup:jsoup:1.11.3'
 }

@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,18 +17,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.util.regex.Pattern;
-
 public class Splash extends AppCompatActivity {
 
     private static final int REQUEST_ACCESS_LOCATION = 1000;
-
-    private String Market_Version;
 
     boolean isPermissionCheck = false;
 
@@ -38,8 +28,7 @@ public class Splash extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        getStoreVersion();
-        VersionCheck();
+        checkpermmission();
     }
 
     public void checkpermmission() {
@@ -157,71 +146,5 @@ public class Splash extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-    }
-
-    public void VersionCheck(){
-        String version_name = BuildConfig.VERSION_NAME;
-        Log.e("Version_Name : ", version_name);
-        Log.e("MarKet_Version : ", Market_Version);
-
-        try {
-            if (!Market_Version.equals(version_name)){
-                String[] Gradle_Version = version_name.split("\\.");
-                String[] Market = Market_Version.split("\\.");
-
-                if (!Gradle_Version[1].equals(Market[1])){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(Splash.this);
-                    builder.setMessage("업데이트가 필요합니다. 확인을 누르면 플레이스토어로 이동합니다.").setCancelable(false);
-                    builder.setPositiveButton("이동", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            String appPackageName = getPackageName();
-                            try{
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-                                finish();
-                            }catch (Exception e){
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                                finish();
-                            }
-                        }
-                    });
-                    builder.show();
-                }else{
-                    checkpermmission();
-                }
-            }else{
-                checkpermmission();
-            }
-        }catch (NullPointerException e){
-            e.printStackTrace();
-        }
-    }
-
-    public void getStoreVersion(){
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try{
-                    Document document = Jsoup.connect("https://play.google.com/store/apps/details?id=com.yonggeun.wifibluetoothreminder").get();
-
-                    Elements version = document.select(".htlgb");
-
-                    for (int i = 0 ; i<30; i++){
-                        Market_Version = version.get(i).text();
-                        if (Pattern.matches("^[0-9]+.[0-9]+.[0-9]+$", Market_Version)){
-                            break;
-                        }
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        });
-        thread.start();
-        try{
-            thread.join();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 }
